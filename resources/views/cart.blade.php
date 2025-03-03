@@ -1,0 +1,76 @@
+@extends('layouts.app')
+
+@section('title', 'Cart')
+
+@section('content')
+<section id="cart" class="section-p1">
+    @if(count($cartItems) > 0)
+    <table width="100%">
+        <thead>
+            <tr>
+                <th>Xóa</th>
+                <th>Ảnh</th>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($cartItems as $item)
+            <tr>
+                <td>
+                    {{-- Nút xóa sản phẩm --}}
+                    <form action="{{ route('remove', $item->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" style="border: none; background: none; cursor: pointer;">
+                            <i class="fa fa-times-circle" style="color: red;"></i>
+                        </button>
+                    </form>
+                </td>
+                <td><img src="{{ asset('img/products/' . $item->product->image) }}" alt="{{ $item->product->name }}" /></td>
+                <td>{{ $item->product->name }}</td>
+                <td>{{ number_format($item->price) }} USD</td>
+                <td>{{ number_format($item->quantity) }}</td>
+                <td>{{ number_format($item->price * $item->quantity) }} USD</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @else
+    <p>Giỏ hàng trống!</p>
+    @endif
+</section>
+
+<section id="cart-add" class="section-p1">
+    <div id="coupon">
+        <h3>Mã giảm giá</h3>
+        <div>
+            <input type="text" placeholder="Nhập mã giảm giá" />
+            <button class="normal">Áp dụng</button>
+        </div>
+    </div>
+    <div id="subtotal">
+        <h3>Tổng đơn hàng</h3>
+        <table>
+            <tr>
+                <td>Tổng tiền:</td>
+                <td>{{ number_format($totalPrice) }} USD</td>
+            </tr>
+            <tr>
+                <td>Vận chuyển:</td>
+                <td>Miễn phí</td>
+            </tr>
+            <tr>
+                <td><strong>Tiền thanh toán:</strong></td>
+                <td><strong>{{ number_format($totalPrice) }} USD</strong></td>
+            </tr>
+        </table>
+        <button class="normal">Tiến hành thanh toán</button>
+    </div>
+</section>
+<section>
+    <a href="{{ route('shop') }}" class="back-to-shop"><i class="fa fa-arrow-left"></i> Back to Shop</a>
+</section>
+@endsection
