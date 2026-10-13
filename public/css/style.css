@@ -753,6 +753,81 @@ footer a:hover {
   height: 100%;
 }
 
+.header-account {
+  color: #088178;
+  font-weight: 600;
+}
+
+.header-logout button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #1a1a1a;
+  cursor: pointer;
+  font: inherit;
+}
+
+.header-logout button:hover {
+  color: #088178;
+}
+
+.auth-page {
+  padding: 48px 20px;
+}
+
+.auth-panel {
+  width: min(100%, 480px);
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid #e1e1e1;
+  background: #fff;
+}
+
+.auth-panel h1 {
+  margin-bottom: 24px;
+  font-size: 28px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form input:not([type="checkbox"]) {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #c9c9c9;
+}
+
+.auth-form input:focus {
+  outline: 2px solid #088178;
+  outline-offset: 1px;
+}
+
+.auth-form .normal {
+  margin-top: 8px;
+}
+
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-error {
+  margin: 0 0 8px;
+  color: #b42318;
+}
+
+.auth-switch {
+  margin-top: 20px;
+}
+
+.auth-switch a {
+  color: #088178;
+}
+
 #form-contact {
   display: flex;
 }

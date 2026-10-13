@@ -8,6 +8,20 @@
             <li><a href="#">Blog</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Contact</a></li>
+            @auth
+                <li><span class="header-account">{{ Auth::user()->name }}</span></li>
+                <li>
+                    <form class="header-logout" method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit">Đăng xuất</button>
+                    </form>
+                </li>
+            @else
+                <li><a class="{{ request()->routeIs('login') ? 'active' : '' }}" href="{{ route('login') }}">Đăng nhập</a>
+                </li>
+                <li><a class="{{ request()->routeIs('register') ? 'active' : '' }}" href="{{ route('register') }}">Đăng
+                        ký</a></li>
+            @endauth
             <li id="lg-bag"><a href="{{ route('cart') }}"><i class="fas fa-shopping-bag"></i></a></li>
             <a href="#" id="close"><i class="fas fa-times"></i></a>
         </ul>

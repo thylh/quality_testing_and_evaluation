@@ -2,65 +2,73 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ShopController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $products = Product::all();
+
         return view('index', compact('products'));
     }
 
-    public function shop() {
+    public function shop()
+    {
         $products = Product::all();
+
         return view('shop', compact('products'));
     }
 
-    public function sproduct($id) {
+    public function sproduct($id)
+    {
         $product = Product::findOrFail($id);
         $relatedProducts = Product::where('id', '!=', $id)->limit(4)->get();
+
         return view('sproduct', compact('product', 'relatedProducts'));
     }
 
     public function addToCart(Request $request, $id)
     {
-        $product = Product::find($id);
-        if (!$product) {
-            return redirect()->back()->with('error', 'Sản phẩm không tồn tại!');
-        }
+        $validated = $request->validate([
+            'quantity' => ['sometimes', 'required', 'integer', 'min:1', 'max:99'],
+            'size' => ['nullable', Rule::in(['XXL', 'XL', 'Medium', 'Small'])],
+        ]);
 
-        // Lấy hoặc tạo session_id
-        if (!session()->has('cart_session_id')) {
-            session()->put('cart_session_id', (string) Str::uuid());
-        }
-        $session_id = session()->get('cart_session_id');
+        $product = Product::findOrFail($id);
+        $quantity = $validated['quantity'] ?? 1;
+        $size = $validated['size'] ?? null;
 
-        // Lấy hoặc tạo giỏ hàng
-        $cart = Cart::firstOrCreate(['session_id' => $session_id]);
+        $cart = $this->getOrCreateCurrentCart();
 
         // Kiểm tra nếu sản phẩm đã có trong giỏ thì tăng số lượng
         $cartItem = CartItem::where('cart_id', $cart->id)
-                            ->where('product_id', $product->id)
-                            ->where(function($query) use ($request) {
-                                $query->where('size', $request->size)
-                                    ->orWhereNull('size');
-                            })
-                            ->first();
+            ->where('product_id', $product->id)
+            ->where(function ($query) use ($size) {
+                if ($size === null) {
+                    $query->whereNull('size');
+                } else {
+                    $query->where('size', $size);
+                }
+            })
+            ->first();
 
         if ($cartItem) {
-            $cartItem->quantity += $request->quantity ?? 1;
+            $cartItem->quantity += $quantity;
             $cartItem->save();
         } else {
             // Thêm sản phẩm mới vào giỏ hàng
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
-                'size' => $request->size ?? null,
-                'quantity' => $request->quantity ?? 1,
+                'size' => $size,
+                'quantity' => $quantity,
                 'price' => $product->price,
             ]);
         }
@@ -70,35 +78,66 @@ class ShopController extends Controller
 
     public function cart()
     {
-        $session_id = session()->get('cart_session_id');
-        $cart = Cart::where('session_id', $session_id)->with('items.product')->first();
+        $cart = $this->currentCart()?->load('items.product');
 
-        if (!$cart) {
+        if (! $cart) {
             return view('cart', [
                 'cartItems' => [],
-                'totalPrice' => 0
+                'totalPrice' => 0,
             ]);
         }
 
         // Tính tổng tiền
-        $totalPrice = $cart->items->sum(function($item) {
+        $totalPrice = $cart->items->sum(function ($item) {
             return $item->price * $item->quantity;
         });
 
         return view('cart', [
             'cartItems' => $cart->items,
-            'totalPrice' => $totalPrice
+            'totalPrice' => $totalPrice,
         ]);
     }
 
     public function remove($id)
     {
-        // Tìm và xóa sản phẩm khỏi giỏ hàng
-        $cartItem = CartItem::find($id);
-        if ($cartItem) {
-            $cartItem->delete();
-        }
+        $cartItem = $this->currentCart()?->items()->find($id);
+        abort_unless($cartItem, 404);
+
+        $cartItem->delete();
+
         return redirect()->route('cart')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
+    private function currentCart(): ?Cart
+    {
+        if (Auth::check()) {
+            return Cart::where('user_id', Auth::id())->first();
+        }
+
+        $sessionId = session('cart_session_id');
+        if (! $sessionId) {
+            return null;
+        }
+
+        return Cart::whereNull('user_id')->where('session_id', $sessionId)->first();
+    }
+
+    private function getOrCreateCurrentCart(): Cart
+    {
+        if (Auth::check()) {
+            return Cart::firstOrCreate(
+                ['user_id' => Auth::id()],
+                ['session_id' => null]
+            );
+        }
+
+        if (! session()->has('cart_session_id')) {
+            session()->put('cart_session_id', (string) Str::uuid());
+        }
+
+        return Cart::firstOrCreate(
+            ['session_id' => session('cart_session_id')],
+            ['user_id' => null]
+        );
+    }
 }
