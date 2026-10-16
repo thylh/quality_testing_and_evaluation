@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Product;
+use Illuminate\Database\Seeder;
 
 class AddProductsSeeder extends Seeder
 {
@@ -13,134 +12,118 @@ class AddProductsSeeder extends Seeder
      */
     public function run(): void
     {
+        Product::query()->delete();
+
         $products = [
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
+                'name' => 'Cartoon Astronaut T-Shirt',
                 'brand' => 'adidas',
                 'image' => 'f1.jpg',
                 'price' => 78,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Floral Printed Shirt',
+                'brand' => 'H&M',
                 'image' => 'f2.jpg',
-                'price' => 78,
+                'price' => 82,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Classic Denim Jacket',
+                'brand' => 'Levi\'s',
                 'image' => 'f3.jpg',
-                'price' => 78,
+                'price' => 120,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Urban Street Hoodie',
+                'brand' => 'Nike',
                 'image' => 'f4.jpg',
-                'price' => 78,
+                'price' => 95,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Summer Polo Shirt',
+                'brand' => 'Puma',
                 'image' => 'f5.jpg',
-                'price' => 78,
+                'price' => 88,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Modern Cotton Tee',
+                'brand' => 'Uniqlo',
                 'image' => 'f6.jpg',
-                'price' => 78,
+                'price' => 74,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
+                'name' => 'Premium Oversize Jacket',
                 'brand' => 'adidas',
                 'image' => 'f7.jpg',
-                'price' => 78,
+                'price' => 150,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Lightweight Sport Tee',
+                'brand' => 'Nike',
                 'image' => 'f8.jpg',
-                'price' => 78,
+                'price' => 68,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Elegant Casual Shirt',
+                'brand' => 'Zara',
                 'image' => 'n1.jpg',
-                'price' => 78,
+                'price' => 90,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Minimalist Long Sleeve',
+                'brand' => 'H&M',
                 'image' => 'n2.jpg',
-                'price' => 78,
+                'price' => 76,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Travel Cotton Hoodie',
+                'brand' => 'Puma',
                 'image' => 'n3.jpg',
-                'price' => 78,
+                'price' => 110,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Essential Crew Neck',
+                'brand' => 'Uniqlo',
                 'image' => 'n4.jpg',
-                'price' => 78,
+                'price' => 70,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Weekend Fashion Tee',
+                'brand' => 'Zara',
                 'image' => 'n5.jpg',
-                'price' => 78,
+                'price' => 85,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'City Runner Jacket',
+                'brand' => 'Nike',
                 'image' => 'n6.jpg',
-                'price' => 78,
+                'price' => 130,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
-                'brand' => 'adidas',
+                'name' => 'Everyday Casual Polo',
+                'brand' => 'Levi\'s',
                 'image' => 'n7.jpg',
-                'price' => 78,
+                'price' => 98,
             ],
             [
-                'name' => 'Cartoon Astronaut T-Shirts',
+                'name' => 'Street Style Oversized Tee',
                 'brand' => 'adidas',
                 'image' => 'n8.jpg',
-                'price' => 78,
+                'price' => 79,
             ],
         ];
 
-        foreach ($products as $product) { // Duyệt mảng và thêm từng sp 1 
-            Product::create($product);
+        foreach ($products as $product) {
+            Product::firstOrCreate(
+                [
+                    'name' => $product['name'],
+                    'brand' => $product['brand'],
+                    'image' => $product['image'],
+                ],
+                [
+                    'price' => $product['price'],
+                ]
+            );
         }
-
     }
-    // public function run()
-    // {
-    //   Thêm 1 sp  
-    //     Product::create([
-    //         'name' => 'Sản phẩm mới',
-    //         'brand' => 'New Brand',
-    //         'image' => 'new-product.jpg',
-    //         'price' => 99.99
-    //     ]);
-
-    //  Thêm nhiều sp nhanh
-    //     Product::insert([
-    //     [
-    //          'name' => 'Áo Thun Nam Nike',
-    //          'brand' => 'Nike',
-    //          'image' => 'nike-tshirt.jpg',
-    //          'price' => 299.99,
-    //     ],
-    //     [
-    //          'name' => 'Giày Adidas Superstar',
-    //          'brand' => 'Adidas',
-    //          'image' => 'adidas-superstar.jpg',
-    //          'price' => 999.99,
-    //     ]
-    //     ]);
-    // }
 }

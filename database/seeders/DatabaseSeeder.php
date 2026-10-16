@@ -1,8 +1,7 @@
 <?php
 
 namespace Database\Seeders;
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,19 +11,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-    //     // User::factory(10)->create();
-
-    //     User::factory()->create([
-    //         'name' => 'Test User',
-    //         'email' => 'test@example.com',
-    //     ]);
         $this->call([
             AddProductsSeeder::class,
-            DeleteProductsSeeder::class,
-            UpdateProductsSeeder::class,
         ]);
     }
 }
+
+// Cách chạy nhanh:
+// php artisan migrate:fresh --seed
+// hoặc
 // php artisan db:seed --class=AddProductsSeeder
-// php artisan db:seed --class=DeleteProductsSeeder
-// php artisan db:seed --class=UpdateProductsSeeder

@@ -108,6 +108,21 @@ class ShopController extends Controller
         return redirect()->route('cart')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
+    public function updateQuantity(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:1', 'max:99'],
+        ]);
+
+        $cartItem = $this->currentCart()?->items()->find($id);
+        abort_unless($cartItem, 404);
+
+        $cartItem->quantity = $validated['quantity'];
+        $cartItem->save();
+
+        return redirect()->route('cart')->with('success', 'Đã cập nhật số lượng sản phẩm!');
+    }
+
     private function currentCart(): ?Cart
     {
         if (Auth::check()) {

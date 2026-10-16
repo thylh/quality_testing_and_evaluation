@@ -13,9 +13,9 @@
     </div>
 
     <div class="single-product-details">
-      <h6>Home / T-Shirt</h6>
-      <h4>Cartoon Astronaut T-Shirts</h4>
-      <h2>$78</h2>
+      <h6>Home / {{ $product->brand ?? 'Product' }}</h6>
+      <h4>{{ $product->name }}</h4>
+      <h2>{{ number_format($product->price) }} USD</h2>
       <form action="{{ route('addtocart', $product->id ?? 1) }}" method="POST">
         @csrf
         <select name="size" required>
@@ -33,7 +33,8 @@
         <button type="submit">Thêm vào giỏ hàng</button>
       </form>
       <h4>Thông tin sản phẩm</h4>
-      <span>Lorem ipsum dolor sit...</span>
+      <span>Thương hiệu: {{ $product->brand ?? 'N/A' }}. Giá sản phẩm hiện tại: {{ number_format($product->price) }}
+        USD.</span>
     </div>
   </section>
   <section>

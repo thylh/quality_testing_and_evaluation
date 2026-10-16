@@ -2,12 +2,27 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { spawn, spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import net from 'node:net';
+import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 
-const baseUrl = process.env.SELENIUM_BASE_URL ?? 'http://127.0.0.1:8017';
+let baseUrl = process.env.SELENIUM_BASE_URL ?? null;
+const projectRoot = fileURLToPath(new URL('../..', import.meta.url));
 const temporaryDirectory = mkdtempSync(join(tmpdir(), 'laravel-selenium-'));
 const databasePath = join(temporaryDirectory, 'testing.sqlite');
 writeFileSync(databasePath, '');
+
+async function getAvailablePort() {
+    return new Promise((resolve, reject) => {
+        const server = net.createServer();
+
+        server.on('error', reject);
+        server.listen(0, '127.0.0.1', () => {
+            const { port } = server.address();
+            server.close(() => resolve(port));
+        });
+    });
+}
 
 const testEnvironment = {
     ...process.env,
@@ -17,6 +32,7 @@ const testEnvironment = {
     SESSION_DRIVER: 'cookie',
     CACHE_STORE: 'array',
     QUEUE_CONNECTION: 'sync',
+    SELENIUM_BASE_URL: baseUrl,
 };
 
 let server;
@@ -43,8 +59,14 @@ async function waitForServer() {
 }
 
 try {
+    const port = await getAvailablePort();
+    baseUrl = process.env.SELENIUM_BASE_URL ?? `http://127.0.0.1:${port}`;
+
+    testEnvironment.SELENIUM_BASE_URL = baseUrl;
+
     const migration = spawnSync('php', ['artisan', 'migrate', '--force'], {
         env: testEnvironment,
+        cwd: projectRoot,
         stdio: 'inherit',
     });
 
@@ -55,8 +77,37 @@ try {
         throw new Error(`Test database migration failed with code ${migration.status}`);
     }
 
-    server = spawn('php', ['artisan', 'serve', '--host=127.0.0.1', '--port=8017'], {
+    const seeding = spawnSync('php', ['artisan', 'db:seed', '--class=AddProductsSeeder', '--force'], {
         env: testEnvironment,
+        cwd: projectRoot,
+        stdio: 'inherit',
+    });
+
+    if (seeding.error) {
+        throw seeding.error;
+    }
+    if (seeding.status !== 0) {
+        throw new Error(`Test database seeding failed with code ${seeding.status}`);
+    }
+
+    const productCount = spawnSync('php', ['artisan', 'tinker', '--execute', 'echo App\\Models\\Product::count();'], {
+        env: testEnvironment,
+        cwd: projectRoot,
+        encoding: 'utf8',
+    });
+
+    if (productCount.error) {
+        throw productCount.error;
+    }
+    if (productCount.status !== 0) {
+        throw new Error(`Product count verification failed with code ${productCount.status}`);
+    }
+
+    console.log(`Selenium test database seed count: ${productCount.stdout.trim()}`);
+
+    server = spawn('php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${port}`], {
+        env: testEnvironment,
+        cwd: projectRoot,
         stdio: 'inherit',
     });
 
@@ -65,7 +116,10 @@ try {
     const testProcess = spawn(
         process.execPath,
         ['--test', 'tests/selenium/authentication.test.js'],
-        { stdio: 'inherit' },
+        {
+            env: testEnvironment,
+            stdio: 'inherit',
+        },
     );
 
     process.exitCode = await new Promise((resolve, reject) => {

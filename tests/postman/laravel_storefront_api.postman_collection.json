@@ -1,0 +1,173 @@
+{
+  "info": {
+    "name": "Laravel Storefront API - Product Testing",
+    "description": "Collection for validating product endpoints in the Laravel storefront application.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "c9dd9b7f-7660-4d4d-9150-8e4e286c3d3d"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "product_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Products - List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has data array\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"data\");",
+              "  pm.expect(json.data).to.be.an(\"array\");",
+              "  pm.expect(json.data.length).to.be.above(0);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "if (json && json.data && json.data.length > 0) {",
+              "  pm.collectionVariables.set(\"product_id\", String(json.data[0].id));",
+              "}",
+              ""
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/products",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Products - Detail",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response contains product data\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"data\");",
+              "  pm.expect(json.data).to.have.property(\"id\");",
+              "  pm.expect(json.data).to.have.property(\"name\");",
+              "  pm.expect(json.data).to.have.property(\"price\");",
+              "});",
+              "",
+              "pm.test(\"Returned product matches selected id\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(Number(json.data.id)).to.eql(Number(pm.collectionVariables.get(\"product_id\")));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/products/{{product_id}}",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "products",
+            "{{product_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Products - Not Found",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/products/999999",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "products",
+            "999999"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

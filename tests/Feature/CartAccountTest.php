@@ -161,6 +161,43 @@ class CartAccountTest extends TestCase
         $this->assertDatabaseCount('cart_items', 0);
     }
 
+    public function test_product_detail_page_displays_real_product_information(): void
+    {
+        $product = $this->createProduct('Premium Cotton T-Shirt');
+
+        $this->get(route('sproduct', $product->id))
+            ->assertOk()
+            ->assertSeeText('Premium Cotton T-Shirt')
+            ->assertSeeText('250');
+    }
+
+    public function test_user_can_update_cart_item_quantity(): void
+    {
+        $user = User::create([
+            'name' => 'Cart Updater',
+            'email' => 'update@example.com',
+            'password' => 'password123',
+        ]);
+        $product = $this->createProduct('Quantity Update Product');
+        $cart = Cart::create(['user_id' => $user->id, 'session_id' => null]);
+        $item = CartItem::create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'size' => 'Medium',
+            'quantity' => 1,
+            'price' => $product->price,
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('cart.update', $item->id), ['quantity' => 5])
+            ->assertRedirect(route('cart'));
+
+        $this->assertDatabaseHas('cart_items', [
+            'id' => $item->id,
+            'quantity' => 5,
+        ]);
+    }
+
     private function createProduct(string $name): Product
     {
         return Product::create([
