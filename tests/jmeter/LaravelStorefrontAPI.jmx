@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.9" jmeter="5.6.3">
     <hashTree>
-        <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Laravel Storefront API Load Test" enabled="true">
-            <stringProp name="TestPlan.comments">Performance test plan for product API endpoints.</stringProp>
+        <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Laravel Storefront Read-Only Load Test" enabled="true">
+            <stringProp name="TestPlan.comments">Parameterized load profiles for storefront pages and product API reads.</stringProp>
             <boolProp name="TestPlan.functional_mode">false</boolProp>
             <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
             <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -22,25 +22,139 @@
             <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
         </TestPlan>
         <hashTree>
-            <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Product API Users" enabled="true">
+            <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Storefront Read-Only Users" enabled="true">
                 <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
                 <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
                     <boolProp name="LoopController.continue_forever">false</boolProp>
-                    <stringProp name="LoopController.loops">2</stringProp>
+                    <stringProp name="LoopController.loops">${__P(loops,5)}</stringProp>
                 </elementProp>
-                <stringProp name="ThreadGroup.num_threads">10</stringProp>
-                <stringProp name="ThreadGroup.ramp_time">5</stringProp>
-                <boolProp name="ThreadGroup.scheduler">false</boolProp>
-                <stringProp name="ThreadGroup.duration"></stringProp>
+                <stringProp name="ThreadGroup.num_threads">${__P(threads,10)}</stringProp>
+                <stringProp name="ThreadGroup.ramp_time">${__P(ramp,5)}</stringProp>
+                <boolProp name="ThreadGroup.scheduler">${__P(scheduler,false)}</boolProp>
+                <stringProp name="ThreadGroup.duration">${__P(duration,0)}</stringProp>
                 <stringProp name="ThreadGroup.delay"></stringProp>
             </ThreadGroup>
             <hashTree>
+                <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager" enabled="true">
+                    <collectionProp name="CookieManager.cookies"/>
+                    <boolProp name="CookieManager.clearEachIteration">false</boolProp>
+                    <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
+                </CookieManager>
+                <hashTree/>
+                <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="User Think Time" enabled="true">
+                    <stringProp name="ConstantTimer.delay">${__P(think_time,0)}</stringProp>
+                </ConstantTimer>
+                <hashTree/>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /home" enabled="true">
+                    <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                        <collectionProp name="Arguments.arguments"/>
+                    </elementProp>
+                    <stringProp name="HTTPSampler.domain">${__P(host,127.0.0.1)}</stringProp>
+                    <stringProp name="HTTPSampler.port">${__P(port,8000)}</stringProp>
+                    <stringProp name="HTTPSampler.protocol">http</stringProp>
+                    <stringProp name="HTTPSampler.path">/home</stringProp>
+                    <stringProp name="HTTPSampler.method">GET</stringProp>
+                    <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                    <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                    <boolProp name="HTTPSampler.do_multipart">false</boolProp>
+                    <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                    <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                    <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                    <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                        <collectionProp name="Asserion.test_strings">
+                            <stringProp name="49586">200</stringProp>
+                        </collectionProp>
+                        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                        <boolProp name="Assertion.assume_success">false</boolProp>
+                        <intProp name="Assertion.test_type">2</intProp>
+                    </ResponseAssertion>
+                    <hashTree/></hashTree>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /shop" enabled="true">
+                    <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                        <collectionProp name="Arguments.arguments"/>
+                    </elementProp>
+                    <stringProp name="HTTPSampler.domain">${__P(host,127.0.0.1)}</stringProp>
+                    <stringProp name="HTTPSampler.port">${__P(port,8000)}</stringProp>
+                    <stringProp name="HTTPSampler.protocol">http</stringProp>
+                    <stringProp name="HTTPSampler.path">/shop</stringProp>
+                    <stringProp name="HTTPSampler.method">GET</stringProp>
+                    <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                    <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                    <boolProp name="HTTPSampler.do_multipart">false</boolProp>
+                    <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                    <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                    <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                    <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                        <collectionProp name="Asserion.test_strings">
+                            <stringProp name="49586">200</stringProp>
+                        </collectionProp>
+                        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                        <boolProp name="Assertion.assume_success">false</boolProp>
+                        <intProp name="Assertion.test_type">2</intProp>
+                    </ResponseAssertion>
+                    <hashTree/></hashTree>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /product/{id}" enabled="true">
+                    <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                        <collectionProp name="Arguments.arguments"/>
+                    </elementProp>
+                    <stringProp name="HTTPSampler.domain">${__P(host,127.0.0.1)}</stringProp>
+                    <stringProp name="HTTPSampler.port">${__P(port,8000)}</stringProp>
+                    <stringProp name="HTTPSampler.protocol">http</stringProp>
+                    <stringProp name="HTTPSampler.path">/product/${PRODUCT_ID}</stringProp>
+                    <stringProp name="HTTPSampler.method">GET</stringProp>
+                    <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                    <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                    <boolProp name="HTTPSampler.do_multipart">false</boolProp>
+                    <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                    <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                    <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                    <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                        <collectionProp name="Asserion.test_strings">
+                            <stringProp name="49586">200</stringProp>
+                        </collectionProp>
+                        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                        <boolProp name="Assertion.assume_success">false</boolProp>
+                        <intProp name="Assertion.test_type">2</intProp>
+                    </ResponseAssertion>
+                    <hashTree/></hashTree>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /cart" enabled="true">
+                    <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                        <collectionProp name="Arguments.arguments"/>
+                    </elementProp>
+                    <stringProp name="HTTPSampler.domain">${__P(host,127.0.0.1)}</stringProp>
+                    <stringProp name="HTTPSampler.port">${__P(port,8000)}</stringProp>
+                    <stringProp name="HTTPSampler.protocol">http</stringProp>
+                    <stringProp name="HTTPSampler.path">/cart</stringProp>
+                    <stringProp name="HTTPSampler.method">GET</stringProp>
+                    <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                    <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                    <boolProp name="HTTPSampler.do_multipart">false</boolProp>
+                    <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                    <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                    <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                    <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                        <collectionProp name="Asserion.test_strings">
+                            <stringProp name="49586">200</stringProp>
+                        </collectionProp>
+                        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                        <boolProp name="Assertion.assume_success">false</boolProp>
+                        <intProp name="Assertion.test_type">2</intProp>
+                    </ResponseAssertion>
+                    <hashTree/></hashTree>
                 <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/products" enabled="true">
                     <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                         <collectionProp name="Arguments.arguments"/>
                     </elementProp>
-                    <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
-                    <stringProp name="HTTPSampler.port">8000</stringProp>
+                    <stringProp name="HTTPSampler.domain">${__P(host,127.0.0.1)}</stringProp>
+                    <stringProp name="HTTPSampler.port">${__P(port,8000)}</stringProp>
                     <stringProp name="HTTPSampler.protocol">http</stringProp>
                     <stringProp name="HTTPSampler.path">/api/products</stringProp>
                     <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -65,8 +179,8 @@
                     <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                         <collectionProp name="Arguments.arguments"/>
                     </elementProp>
-                    <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
-                    <stringProp name="HTTPSampler.port">8000</stringProp>
+                    <stringProp name="HTTPSampler.domain">${__P(host,127.0.0.1)}</stringProp>
+                    <stringProp name="HTTPSampler.port">${__P(port,8000)}</stringProp>
                     <stringProp name="HTTPSampler.protocol">http</stringProp>
                     <stringProp name="HTTPSampler.path">/api/products/${PRODUCT_ID}</stringProp>
                     <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -81,32 +195,6 @@
                     <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
                         <collectionProp name="Asserion.test_strings">
                             <stringProp name="49586">200</stringProp>
-                        </collectionProp>
-                        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-                        <boolProp name="Assertion.assume_success">false</boolProp>
-                        <intProp name="Assertion.test_type">2</intProp>
-                    </ResponseAssertion>
-                    <hashTree/></hashTree>
-                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/products/999999" enabled="true">
-                    <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                        <collectionProp name="Arguments.arguments"/>
-                    </elementProp>
-                    <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
-                    <stringProp name="HTTPSampler.port">8000</stringProp>
-                    <stringProp name="HTTPSampler.protocol">http</stringProp>
-                    <stringProp name="HTTPSampler.path">/api/products/999999</stringProp>
-                    <stringProp name="HTTPSampler.method">GET</stringProp>
-                    <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                    <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                    <boolProp name="HTTPSampler.do_multipart">false</boolProp>
-                    <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-                    <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-                    <stringProp name="HTTPSampler.response_timeout"></stringProp>
-                </HTTPSamplerProxy>
-                <hashTree>
-                    <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 404" enabled="true">
-                        <collectionProp name="Asserion.test_strings">
-                            <stringProp name="49586">404</stringProp>
                         </collectionProp>
                         <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
                         <boolProp name="Assertion.assume_success">false</boolProp>

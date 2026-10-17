@@ -268,38 +268,13 @@ Kết quả mong đợi:
 
 ---
 
-## 7. Danh sách công việc còn lại theo ưu tiên
-
-### Ưu tiên cao
-
-- Hoàn thiện auth và session
-- Hoàn thiện cart ownership và validation
-- Hoàn thiện API sản phẩm
-- Viết PHPUnit test cho backend
-- Viết Selenium test cho UI cơ bản
-
-### Ưu tiên trung bình
-
-- Tạo Postman collection cho API
-- Tạo JMeter script cho hiệu năng
-- Kiểm thử flow search và checkout
-- Kiểm tra tính nhất quán dữ liệu giữa UI, database và API
-
-### Ưu tiên thấp
-
-- Cải thiện giao diện dữ liệu tĩnh
-- Tối ưu hóa trải nghiệm người dùng
-- Làm báo cáo kiểm định và đánh giá cuối cùng
-
----
-
-## 8. Kết luận sơ khai
+## 7. Kết luận sơ khai
 
 Dự án ở trạng thái đầu cần được xây dựng theo hướng rõ ràng: chức năng trước, kiểm thử sau. Trước hết, cần hoàn thiện logic nghiệp vụ cốt lõi như auth, cart, API và validation. Sau đó mới triển khai test tự động cho backend và UI. Cuối cùng mới làm kiểm thử hiệu năng và báo cáo tổng kết. Điều này giúp đảm bảo rằng hệ thống không chỉ “chạy được”, mà còn “được kiểm định đúng cách” theo chuẩn phần mềm thực tế.
 
 ---
 
-## 9. Mục tiêu cuối cùng của dự án
+## 8. Mục tiêu cuối cùng của dự án
 
 Đến khi hoàn thành, hệ thống cần đạt các tiêu chí sau:
 

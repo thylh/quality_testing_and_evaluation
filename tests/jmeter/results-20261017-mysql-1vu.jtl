@@ -1,0 +1,13 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1792176074375,165,GET /home,200,OK,Product API Users 1-1,text,true,,14795,123,1,1,http://127.0.0.1:8000/home,160,0,20
+1792176074542,178,GET /shop,200,OK,Product API Users 1-1,text,true,,25311,123,1,1,http://127.0.0.1:8000/shop,177,0,1
+1792176074721,151,GET /product/{id},200,OK,Product API Users 1-1,text,true,,6735,128,1,1,http://127.0.0.1:8000/product/1,149,0,0
+1792176074872,147,GET /cart,200,OK,Product API Users 1-1,text,true,,6441,123,1,1,http://127.0.0.1:8000/cart,145,0,1
+1792176075020,135,GET /api/products,200,OK,Product API Users 1-1,text,true,,1652,131,1,1,http://127.0.0.1:8000/api/products,134,0,0
+1792176075156,161,GET /api/products/{id},200,OK,Product API Users 1-1,text,true,,323,133,1,1,http://127.0.0.1:8000/api/products/1,160,0,1
+1792176075318,157,GET /home,200,OK,Product API Users 1-1,text,true,,14795,123,1,1,http://127.0.0.1:8000/home,156,0,1
+1792176075475,181,GET /shop,200,OK,Product API Users 1-1,text,true,,25311,123,1,1,http://127.0.0.1:8000/shop,180,0,1
+1792176075657,120,GET /product/{id},200,OK,Product API Users 1-1,text,true,,6735,128,1,1,http://127.0.0.1:8000/product/1,119,0,0
+1792176075777,127,GET /cart,200,OK,Product API Users 1-1,text,true,,6441,123,1,1,http://127.0.0.1:8000/cart,126,0,1
+1792176075905,150,GET /api/products,200,OK,Product API Users 1-1,text,true,,1652,131,1,1,http://127.0.0.1:8000/api/products,148,0,0
+1792176076055,165,GET /api/products/{id},200,OK,Product API Users 1-1,text,true,,323,133,1,1,http://127.0.0.1:8000/api/products/1,163,0,1

@@ -77,7 +77,9 @@
                     <td><strong>{{ number_format($totalPrice) }} USD</strong></td>
                 </tr>
             </table>
-            <button class="normal">Tiến hành thanh toán</button>
+            @if(count($cartItems) > 0)
+                <a class="normal" href="{{ route('checkout') }}">Tiến hành thanh toán</a>
+            @endif
         </div>
     </section>
     <section>

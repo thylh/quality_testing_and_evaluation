@@ -59,6 +59,26 @@ test('registration form requires all account fields before submit', { concurrenc
     assert.match(await driver.getCurrentUrl(), /\/register$/);
 });
 
+test('registered user can log out from the header', { concurrency: false }, async () => {
+    await driver.get(`${baseUrl}/register`);
+    await driver.findElement(By.id('name')).sendKeys('Selenium Logout User');
+    await driver.findElement(By.id('email')).sendKeys(`selenium-logout-${Date.now()}@example.com`);
+    await driver.findElement(By.id('password')).sendKeys('password123');
+    await driver.findElement(By.id('password_confirmation')).sendKeys('password123');
+    await driver.findElement(By.css('button[type="submit"]')).click();
+
+    const logoutButton = await driver.wait(
+        until.elementLocated(By.css('.header-logout button[type="submit"]')),
+        5000,
+    );
+    await logoutButton.click();
+
+    await driver.wait(until.urlMatches(/\/login$/), 5000);
+    await driver.wait(until.elementLocated(By.css('.auth-panel h1')), 5000);
+    assert.equal(await driver.findElements(By.css('.header-logout')).then((items) => items.length), 0);
+    assert.equal(await driver.findElement(By.css('.auth-panel h1')).getText(), 'Đăng nhập');
+});
+
 test('shop displays product cards and product detail page loads real product data', { concurrency: false }, async () => {
     await driver.get(`${baseUrl}/shop`);
     await driver.wait(until.elementLocated(By.css('.pro')), 5000);
@@ -102,4 +122,66 @@ test('buyer can add a product to cart from the product detail page', { concurren
     const cartText = await driver.findElement(By.css('body')).getText();
 
     assert.match(cartText, /Tổng tiền:|Cập nhật|Cartoon Astronaut T-Shirt/);
+});
+
+test('registered buyer can recover from a failed simulated payment', { concurrency: false }, async () => {
+    await driver.get(`${baseUrl}/register`);
+    await driver.findElement(By.id('name')).sendKeys('Selenium Checkout User');
+    await driver.findElement(By.id('email')).sendKeys(`selenium-checkout-${Date.now()}@example.com`);
+    await driver.findElement(By.id('password')).sendKeys('password123');
+    await driver.findElement(By.id('password_confirmation')).sendKeys('password123');
+    await driver.findElement(By.css('button[type="submit"]')).click();
+
+    await driver.get(`${baseUrl}/shop`);
+    await driver.wait(until.elementLocated(By.css('.pro a[href*="/product/"]')), 5000);
+    await driver.findElement(By.css('.pro a[href*="/product/"]')).click();
+    await driver.wait(until.urlContains('/product/'), 5000);
+
+    const sizeSelect = await driver.findElement(By.css('select[name="size"]'));
+    await driver.executeScript(
+        "arguments[0].value = 'Medium'; arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
+        sizeSelect,
+    );
+    const addToCartForm = await driver.findElement(By.css('form[action*="/addtocart/"]'));
+    await driver.executeScript('arguments[0].requestSubmit()', addToCartForm);
+    await driver.wait(until.stalenessOf(addToCartForm), 5000);
+    await driver.wait(until.urlMatches(/\/product\/\d+$/), 5000);
+
+    await driver.get(`${baseUrl}/cart`);
+    await driver.wait(until.elementLocated(By.css('a[href*="/checkout"]')), 5000);
+    await driver.findElement(By.css('a[href*="/checkout"]')).click();
+    await driver.wait(until.elementLocated(By.id('customer_phone')), 5000);
+    await driver.findElement(By.id('customer_phone')).sendKeys('0123456789');
+    await driver.findElement(By.id('shipping_address')).sendKeys('123 Selenium Test Street');
+
+    const simulatedPayment = await driver.findElement(
+        By.css('input[name="payment_method"][value="simulated"]'),
+    );
+    await simulatedPayment.click();
+    await driver.executeScript(`
+        const outcome = document.getElementById('simulated_result');
+        outcome.value = 'failure';
+        outcome.dispatchEvent(new Event('change', { bubbles: true }));
+    `);
+    await driver.findElement(By.css('form[action*="/checkout"] button[type="submit"]')).click();
+
+    const paymentError = await driver.wait(until.elementLocated(By.css('[role="alert"]')), 5000);
+    assert.match(await paymentError.getText(), /thất bại/i);
+    assert.match(await driver.findElement(By.css('body')).getText(), /Cartoon Astronaut T-Shirt/);
+
+    await driver.findElement(By.css('input[name="payment_method"][value="simulated"]')).click();
+    await driver.executeScript(`
+        const outcome = document.getElementById('simulated_result');
+        outcome.value = 'success';
+        outcome.dispatchEvent(new Event('change', { bubbles: true }));
+    `);
+    await driver.findElement(By.css('form[action*="/checkout"] button[type="submit"]')).click();
+
+    await driver.wait(until.urlMatches(/\/orders\/[0-9a-f-]+$/), 5000);
+    assert.equal(await driver.findElement(By.css('h1')).getText(), 'Đặt hàng thành công');
+    assert.match(await driver.findElement(By.css('body')).getText(), /Thanh toán mô phỏng/);
+    assert.match(await driver.findElement(By.css('body')).getText(), /Đã thanh toán/);
+
+    await driver.get(`${baseUrl}/cart`);
+    assert.match(await driver.findElement(By.css('body')).getText(), /Giỏ hàng trống/);
 });

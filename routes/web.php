@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CheckoutController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,3 +30,9 @@ Route::post('/addtocart/{id}', [ShopController::class, 'addtocart'])->name('addt
 Route::get('/cart', [ShopController::class, 'cart'])->name('cart');
 Route::put('/cart/update/{id}', [ShopController::class, 'updateQuantity'])->name('cart.update');
 Route::delete('/cart/remove/{id}', [ShopController::class, 'remove'])->name('remove');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/orders/{orderNumber}', [CheckoutController::class, 'showOrder'])->name('checkout.orders.show');
+});
