@@ -4,13 +4,15 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "test:selenium": "node tests/selenium/run.js"
+        "test:selenium": "node tests/selenium/run.js",
+        "test:postman": "node tests/postman/run.js"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^1.2.0",
+        "newman": "^6.2.3",
         "postcss": "^8.4.47",
         "selenium-webdriver": "^4.51.0",
         "tailwindcss": "^3.4.13",

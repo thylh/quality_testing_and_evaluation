@@ -11,7 +11,7 @@ Kế hoạch này mô tả phạm vi hoàn thiện cửa hàng trực tuyến, c
 - Hiển thị danh sách sản phẩm, thông tin và trang chi tiết sản phẩm.
 - Hỗ trợ giỏ hàng của khách và giỏ hàng gắn với tài khoản; kiểm soát quyền sở hữu giỏ hàng.
 - Hỗ trợ đăng ký, đăng nhập, đăng xuất và xác thực dữ liệu đầu vào.
-- Cung cấp giao diện lập trình ứng dụng đọc danh sách sản phẩm và chi tiết sản phẩm.
+- Cung cấp API JSON cho sản phẩm, xác thực token, giỏ hàng và đơn hàng song song với giao diện web.
 - Cho phép người dùng đã đăng nhập đặt hàng bằng phương thức thanh toán khi nhận hàng.
 - Lưu thông tin sản phẩm tại thời điểm đặt hàng; giữ nguyên giỏ hàng nếu quy trình đặt hàng thất bại.
 
@@ -28,7 +28,7 @@ Kế hoạch này mô tả phạm vi hoàn thiện cửa hàng trực tuyến, c
 
 - Dùng PHPUnit để kiểm tra nghiệp vụ, xác thực, giỏ hàng, đặt hàng và giao diện lập trình ứng dụng.
 - Dùng Selenium để tự động hóa các luồng người dùng quan trọng trên trình duyệt.
-- Dùng Postman/Newman để xác nhận mã phản hồi và nội dung của giao diện lập trình ứng dụng.
+- Dùng Postman/Newman để xác nhận mã phản hồi và nội dung API sản phẩm, xác thực, giỏ hàng và đơn hàng.
 - Dùng Apache JMeter để đo phản hồi và thông lượng ở một số mức tải, bao gồm luồng chỉ đọc và luồng đặt hàng.
 - Dùng OWASP ZAP Baseline để rà soát thụ động cấu hình và nội dung có thể quan sát trên ứng dụng chạy trong môi trường cô lập.
 - Lưu kịch bản và kết quả có thể chạy lại; ghi rõ giới hạn môi trường để tránh diễn giải kết quả thử nghiệm cục bộ thành cam kết sản xuất.
@@ -41,7 +41,13 @@ Kế hoạch này mô tả phạm vi hoàn thiện cửa hàng trực tuyến, c
 - Giao diện lập trình ứng dụng trả dữ liệu sản phẩm theo định dạng JSON và mã phản hồi phù hợp.
 - Trường hợp mã sản phẩm không tồn tại được xử lý rõ ràng.
 
-### 4.2. Tài khoản và giỏ hàng
+### 4.2. API xác thực, giỏ hàng và đơn hàng
+
+- Đăng ký và đăng nhập trả token truy cập; đăng xuất thu hồi token hiện tại.
+- API giỏ hàng yêu cầu xác thực, kiểm tra dữ liệu và chỉ cho phép thao tác trên giỏ của người dùng hiện tại.
+- API đặt hàng kiểm tra dữ liệu, lưu bản chụp sản phẩm, giữ giỏ khi thanh toán mô phỏng thất bại và chỉ trả đơn hàng của đúng chủ sở hữu.
+
+### 4.3. Tài khoản và giỏ hàng web
 
 - Đăng ký, đăng nhập và đăng xuất hoạt động đúng.
 - Dữ liệu đầu vào được kiểm tra; số lượng sản phẩm phải hợp lệ.
@@ -49,7 +55,7 @@ Kế hoạch này mô tả phạm vi hoàn thiện cửa hàng trực tuyến, c
 - Người dùng không thể xem hoặc thay đổi giỏ hàng của tài khoản khác.
 - Có thể cập nhật và xóa mặt hàng trong giỏ hàng.
 
-### 4.3. Đặt hàng
+### 4.4. Đặt hàng web
 
 - Chỉ người dùng đã đăng nhập mới được tiếp tục đặt hàng.
 - Luồng thanh toán khi nhận hàng tạo đơn và bản chụp chi tiết sản phẩm.
@@ -60,17 +66,24 @@ Kế hoạch này mô tả phạm vi hoàn thiện cửa hàng trực tuyến, c
 
 ### 5.1. PHPUnit
 
-Kiểm thử tự động phía máy chủ cho xác thực, kiểm tra dữ liệu, quyền sở hữu giỏ hàng, đặt hàng và giao diện lập trình ứng dụng. Bộ kiểm thử hiện có 28 bài kiểm thử đạt.
+Kiểm thử tự động phía máy chủ cho xác thực, kiểm tra dữ liệu, quyền sở hữu giỏ hàng, đặt hàng và giao diện lập trình ứng dụng. Báo cáo JUnit tại `storage/app/test-results/phpunit.xml` ghi tên từng ca, trạng thái, thời lượng và thông tin lỗi; lần xác minh gần nhất có 45 ca đạt.
 
 ### 5.2. Selenium
 
-Tự động hóa trình duyệt cho các luồng giao diện quan trọng như đăng ký, đăng nhập, điều hướng, giỏ hàng và đặt hàng. Hiện có 7 bài kiểm thử được ghi nhận đạt, bao gồm thử đặt hàng thất bại rồi thực hiện lại thành công.
+Tự động hóa trình duyệt cho các luồng giao diện quan trọng như đăng ký, đăng nhập, điều hướng, giỏ hàng và đặt hàng. Báo cáo JUnit tại `storage/app/test-results/selenium.xml` ghi kết quả từng kịch bản; lần xác minh gần nhất có 7 ca đạt, bao gồm thử đặt hàng thất bại rồi thực hiện lại thành công. Chạy lại bằng `npm run test:selenium`.
 
 ### 5.3. Postman/Newman
 
-Kiểm tra các điểm cuối sản phẩm, mã phản hồi và nội dung phản hồi. Bộ sưu tập hiện ghi nhận 3 yêu cầu, 6 xác nhận và không có lỗi.
+- Kiểm thử API sản phẩm: danh sách, chi tiết và mã sản phẩm không tồn tại.
+- Kiểm thử đăng ký/đăng nhập/đăng xuất bằng token truy cập, xác thực lỗi, quyền truy cập API giỏ hàng và thu hồi token.
+- Kiểm thử thêm/sửa/xóa giỏ hàng, xác thực số lượng, đặt hàng COD, thất bại thanh toán mô phỏng, danh sách/chi tiết đơn hàng và quyền sở hữu đơn.
+- Chạy collection bằng `npm run test:postman`; runner khởi chạy ứng dụng loopback với cơ sở dữ liệu SQLite tạm, chạy Newman và lưu báo cáo ở `storage/app/test-results/postman.json`. Lần chạy gần nhất đạt 23 request và 47 xác nhận.
 
-### 5.4. Apache JMeter
+### 5.4. Tích hợp liên tục
+
+Workflow `.github/workflows/tests.yml` chạy PHPUnit, Postman/Newman và Selenium trên runner Ubuntu với SQLite. Các báo cáo JUnit và Newman được tải lên cùng lượt chạy workflow trong 14 ngày. JMeter và ZAP không nằm trong workflow mặc định; chạy thủ công trên môi trường local cô lập.
+
+### 5.5. Apache JMeter
 
 - Kịch bản chỉ đọc bao phủ trang chủ cửa hàng, trang sản phẩm, chi tiết sản phẩm, giỏ hàng và giao diện lập trình ứng dụng sản phẩm.
 - Kịch bản đặt hàng bao phủ đăng nhập, thêm sản phẩm, kiểm tra trang đặt hàng, tạo đơn thanh toán khi nhận hàng và đăng xuất.
@@ -78,7 +91,7 @@ Kiểm tra các điểm cuối sản phẩm, mã phản hồi và nội dung ph�
 - Dùng cơ sở dữ liệu riêng `storefront_jmeter_test`; không chạy kịch bản ghi dữ liệu trên cơ sở dữ liệu phát triển hoặc sản xuất.
 - Kết quả hiện có được tạo bằng máy chủ PHP phát triển trên máy cục bộ, do đó chỉ dùng để kiểm tra chức năng và so sánh trong cùng môi trường; không đại diện cho năng lực sản xuất.
 
-### 5.5. OWASP ZAP
+### 5.6. OWASP ZAP
 
 - Chạy ZAP Desktop/Automation Framework cài trực tiếp trên Windows; không yêu cầu Docker.
 - Dùng ZAP Baseline: thu thập địa chỉ bằng trình thu thập truyền thống và chờ phân tích thụ động; không bật bộ quét chủ động.
@@ -148,12 +161,12 @@ Kiểm tra các điểm cuối sản phẩm, mã phản hồi và nội dung ph�
 
 **Công việc**
 
-- Kiểm tra danh sách sản phẩm, chi tiết sản phẩm, mã phản hồi và nội dung JSON.
-- Kiểm tra trường hợp dữ liệu không tồn tại và lỗi đầu vào liên quan.
+- Kiểm tra sản phẩm, xác thực token, giỏ hàng, đặt hàng, quyền sở hữu và mã phản hồi/nội dung JSON.
+- Kiểm tra trường hợp dữ liệu không tồn tại, chưa xác thực, đầu vào sai và thu hồi token.
 
 **Tiêu chí hoàn thành**
 
-- Bộ sưu tập Postman/Newman có thể chạy lại và không có xác nhận thất bại.
+- Bộ sưu tập Postman/Newman có thể chạy lại; kết quả của từng request và xác nhận được lưu lại.
 
 ### Giai đoạn 6: Kiểm thử hiệu năng bằng JMeter
 
@@ -197,15 +210,30 @@ Kiểm tra các điểm cuối sản phẩm, mã phản hồi và nội dung ph�
 - Báo cáo có phạm vi, phương pháp, môi trường, kết quả, giới hạn và khuyến nghị.
 - Không diễn giải kết quả thử nghiệm cục bộ thành chứng nhận hoặc cam kết sản xuất.
 
+### Giai đoạn 8: Tích hợp liên tục
+
+**Công việc**
+
+- Tự động cài môi trường PHP/Node.js và dependency cần thiết trên GitHub Actions.
+- Chạy PHPUnit, Newman và Selenium trên SQLite cô lập cho mỗi lần push, pull request hoặc chạy workflow thủ công.
+- Lưu báo cáo kiểm thử dưới dạng artifact để xem lại lỗi sau khi job kết thúc.
+- Giữ JMeter và ZAP ngoài workflow mặc định; chúng cần cấu hình/môi trường riêng và tiếp tục chạy thủ công trên local.
+
+**Tiêu chí hoàn thành**
+
+- Workflow hoàn tất ba bộ kiểm thử tự động trên runner sạch.
+- Báo cáo JUnit và Newman được đính kèm job dù kiểm thử đạt hay thất bại.
+
 ## 7. Trạng thái và việc tiếp theo
 
-Các chức năng cốt lõi, kiểm thử PHPUnit, Selenium, Postman/Newman, các kịch bản JMeter và tích hợp ZAP Baseline đã được triển khai. JMeter cần được hiểu là số liệu cục bộ; ZAP không còn cảnh báo Trung bình. Cảnh báo thấp còn lại là cookie `XSRF-TOKEN` cần đọc được từ trình duyệt. Báo cáo tổng hợp cuối cùng đang được tạm hoãn.
+Các chức năng cốt lõi, API sản phẩm/xác thực/giỏ hàng/đặt hàng, kiểm thử PHPUnit, Selenium, Postman/Newman, các kịch bản JMeter, tích hợp ZAP Baseline và workflow GitHub Actions đã được cấu hình. Kiểm thử local đã đạt; workflow Actions cần được xác nhận sau lần chạy đầu tiên trên GitHub. Báo cáo tổng hợp cuối cùng đang được tạm hoãn.
 
 Việc tiếp theo khi tiếp tục dự án:
 
-1. Cấu hình `X-Content-Type-Options` cho tệp tĩnh theo máy chủ triển khai thực tế.
-2. Nếu cần đánh giá sâu hơn, thiết kế phạm vi và tài khoản riêng trước khi bật quét ZAP có xác thực hoặc chủ động.
-3. Khi được yêu cầu, lập báo cáo tổng hợp dựa trên kết quả đã lưu và các giới hạn nêu trên.
+1. Theo dõi lần chạy GitHub Actions đầu tiên và xử lý khác biệt môi trường runner nếu phát sinh.
+2. Chỉ mở rộng ma trận coverage khi có yêu cầu hoặc luồng nghiệp vụ mới; ưu tiên rủi ro thay vì tăng số lượng test.
+3. Nếu cần đánh giá sâu hơn, thiết kế phạm vi riêng trước khi bật quét ZAP có xác thực hoặc chủ động.
+4. Khi được yêu cầu, lập báo cáo tổng hợp dựa trên kết quả đã lưu và các giới hạn nêu trên.
 
 ## 8. Điều kiện nghiệm thu cuối
 

@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { spawn, spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -8,6 +8,8 @@ import { setTimeout as delay } from 'node:timers/promises';
 
 let baseUrl = process.env.SELENIUM_BASE_URL ?? null;
 const projectRoot = fileURLToPath(new URL('../..', import.meta.url));
+const reportDirectory = join(projectRoot, 'storage', 'app', 'test-results');
+const reportPath = join(reportDirectory, 'selenium.xml');
 const temporaryDirectory = mkdtempSync(join(tmpdir(), 'laravel-selenium-'));
 const databasePath = join(temporaryDirectory, 'testing.sqlite');
 writeFileSync(databasePath, '');
@@ -115,17 +117,33 @@ try {
 
     const testProcess = spawn(
         process.execPath,
-        ['--test', 'tests/selenium/authentication.test.js'],
+        ['--test', '--test-reporter=junit', 'tests/selenium/authentication.test.js'],
         {
             env: testEnvironment,
-            stdio: 'inherit',
+            stdio: ['inherit', 'pipe', 'inherit'],
         },
     );
 
-    process.exitCode = await new Promise((resolve, reject) => {
+    let report = '';
+    testProcess.stdout.setEncoding('utf8');
+    testProcess.stdout.on('data', (chunk) => {
+        report += chunk;
+    });
+
+    const testExitCode = await new Promise((resolve, reject) => {
         testProcess.once('error', reject);
         testProcess.once('exit', (code) => resolve(code ?? 1));
     });
+    if (report.trim() === '') {
+        throw new Error('Selenium test process did not produce a JUnit report.');
+    }
+
+    mkdirSync(reportDirectory, { recursive: true });
+    const temporaryReportPath = `${reportPath}.tmp`;
+    writeFileSync(temporaryReportPath, report);
+    renameSync(temporaryReportPath, reportPath);
+    console.log(`Selenium test report saved to ${reportPath}`);
+    process.exitCode = testExitCode;
 } catch (error) {
     console.error(error);
     process.exitCode = 1;

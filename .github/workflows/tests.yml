@@ -1,0 +1,70 @@
+name: Kiểm thử tự động
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  application-tests:
+    name: PHPUnit, Newman và Selenium
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: false
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ":memory:"
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
+
+    steps:
+      - name: Lấy mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: bcmath, ctype, curl, dom, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
+          coverage: none
+          tools: composer:v2
+
+      - name: Cài Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Cài Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Cài dependency PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Cài dependency Node.js
+        run: npm ci
+
+      - name: Chạy PHPUnit
+        run: php artisan test --compact
+
+      - name: Chạy Postman/Newman
+        run: npm run test:postman
+
+      - name: Chạy Selenium
+        run: npm run test:selenium
+
+      - name: Lưu báo cáo kiểm thử
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ket-qua-kiem-thu-${{ github.run_id }}
+          path: storage/app/test-results/
+          if-no-files-found: warn
+          retention-days: 14

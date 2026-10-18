@@ -5,6 +5,7 @@
         <ul id="navbar">
             <li><a class="{{ request()->routeIs('index') ? 'active' : '' }}" href="{{ route('index') }}">Home</a></li>
             <li><a class="{{ request()->routeIs('shop') ? 'active' : '' }}" href="{{ route('shop') }}">Shop</a></li>
+            <li><a class="{{ request()->routeIs('test-history.*') ? 'active' : '' }}" href="{{ route('test-history.index') }}">Kết quả kiểm thử</a></li>
             <li><a href="#">Blog</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Contact</a></li>

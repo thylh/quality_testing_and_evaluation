@@ -1,21 +1,24 @@
 # Tiến độ dự án cửa hàng trực tuyến Laravel
 
-Cập nhật: 18/10/2026
+Cập nhật: 19/10/2026
 
 ## 1. Chức năng đã hoàn thành
 
 - Hoàn thiện đăng ký, đăng nhập, đăng xuất, giỏ hàng khách, quyền sở hữu giỏ hàng và kiểm tra dữ liệu.
-- Hoàn thiện giao diện lập trình ứng dụng sản phẩm và bộ sưu tập Postman.
+- Hoàn thiện API sản phẩm, xác thực token, giỏ hàng và đặt hàng; các route API chạy song song, không thay đổi route web.
 - Hoàn thiện đặt hàng chỉ dành cho người dùng đã đăng nhập: thanh toán khi nhận hàng, mô phỏng thành công/thất bại, lưu bản chụp đơn hàng và giữ giỏ hàng nếu thanh toán thất bại.
 - Không triển khai tìm kiếm sản phẩm, phân quyền theo vai trò hoặc cổng thanh toán thực tế.
 
 ## 2. Kết quả kiểm thử
 
-- PHPUnit: 28 bài kiểm thử đạt trong lần chạy gần nhất.
-- Selenium: 7 bài kiểm thử đạt, bao gồm luồng đặt hàng thất bại rồi thử lại thành công.
-- Postman/Newman: 3 yêu cầu, 6 xác nhận, không có lỗi.
+- PHPUnit: 45/45 ca đạt trong lần chạy gần nhất; báo cáo JUnit tự lưu tên, trạng thái, thời lượng và lỗi của từng ca tại `storage/app/test-results/phpunit.xml`.
+- Selenium: 7/7 ca đạt trong lần chạy gần nhất; báo cáo JUnit tự lưu tên kịch bản, trạng thái, thời lượng và lỗi của từng ca tại `storage/app/test-results/selenium.xml`; gồm luồng đặt hàng thất bại rồi thử lại thành công.
+- Postman/Newman: lần chạy gần nhất đạt 23/23 request và 47/47 xác nhận; collection bao phủ sản phẩm, xác thực, giỏ hàng và đặt hàng. Kết quả chi tiết từng request/assertion lưu tại `storage/app/test-results/postman.json`.
+- Tích hợp liên tục: đã cấu hình GitHub Actions chạy PHPUnit, Newman và Selenium, lưu báo cáo thành artifact 14 ngày. Cần theo dõi lần chạy workflow đầu tiên trên GitHub.
 - JMeter: có kịch bản chỉ đọc và kịch bản đặt hàng có ghi dữ liệu.
 - OWASP ZAP: Baseline thụ động hoàn tất trên môi trường cục bộ cô lập.
+- Trang `/test-history` hiển thị kết quả đã ghi nhận; PHPUnit/Selenium đọc báo cáo JUnit và Postman đọc báo cáo Newman mới nhất theo từng ca/request. JMeter/ZAP đọc kết quả đã lưu. Trang chỉ đọc và không chạy lại công cụ.
+- Chưa mở rộng coverage ngoài yêu cầu hiện tại; sẽ bổ sung ma trận tình huống và kiểm thử có mục tiêu khi phát sinh yêu cầu hoặc nghiệp vụ mới.
 
 ## 3. Kết quả JMeter
 
@@ -105,7 +108,7 @@ Chạy máy chủ với `APP_ENV=local` và `DB_DATABASE=storefront_jmeter_test`
 - Đã tự lưu trữ Font Awesome 6.4.2 và phông League Spartan qua Vite; xóa các bảng định kiểu Bunny Fonts, Google Fonts và cdnjs khỏi trang. CSP được thu hẹp để chỉ cho phép tài nguyên kiểu chữ cùng phông cục bộ.
 - Baseline mới nhất: **0 cảnh báo Trung bình, 1 cảnh báo Thấp, 3 cảnh báo Thông tin**. Không còn cảnh báo SRI; các cảnh báo CSP, chống nhúng trang, header MIME và `X-Powered-By` đã được xử lý.
 - Cảnh báo thấp còn lại là cookie `XSRF-TOKEN` không có HttpOnly, cần cho luồng CSRF phía trình duyệt. Cookie phiên vẫn có HttpOnly. Máy chủ ZAP dùng bộ định tuyến kiểm thử đặt header bảo mật cho tệp tĩnh, tương ứng với cấu hình Apache trong `.htaccess`; cần cấu hình header tương đương nếu triển khai trên máy chủ khác Apache.
-- PHPUnit đạt 28 bài kiểm thử; bộ thu thập ZAP tìm thấy 73 địa chỉ và cơ sở dữ liệu mục tiêu vẫn tách biệt. Chưa chạy quét có xác thực hoặc quét chủ động; không thay đổi máy móc thuộc tính của `XSRF-TOKEN`.
+- Tại lần kiểm tra ZAP ngày 18/10/2026, bộ thu thập tìm thấy 73 địa chỉ và cơ sở dữ liệu mục tiêu vẫn tách biệt. Chưa chạy quét có xác thực hoặc quét chủ động; không thay đổi máy móc thuộc tính của `XSRF-TOKEN`. Lần chạy PHPUnit mới nhất ngày 19/10/2026 đạt 45/45 ca.
 - Thông tin phân tích của ZAP có thể ghi nhận cảnh báo phụ trợ do thiếu tích hợp trình duyệt Firefox/Selenium. Bộ thu thập truyền thống và phân tích thụ động không cần Firefox; xem đây là giới hạn môi trường, không phải lỗi làm quét thất bại.
 
 ## 5. Giới hạn và việc còn lại

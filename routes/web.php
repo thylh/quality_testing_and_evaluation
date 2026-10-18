@@ -1,16 +1,24 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TestHistoryController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/mycontroller', [StudentController::class, 'show'] );
-Route::get('/new/{id}', [NewsController::class, 'show'] );
+Route::get('/mycontroller', [StudentController::class, 'show']);
+Route::get('/new/{id}', [NewsController::class, 'show']);
+Route::get('/test-history', [TestHistoryController::class, 'index'])->name('test-history.index');
+Route::get('/test-history/{run}', [TestHistoryController::class, 'show'])
+    ->whereIn('run', ['phpunit', 'selenium', 'postman', 'jmeter-readonly', 'jmeter-checkout', 'zap'])
+    ->name('test-history.show');
+Route::get('/test-history/artifacts/{artifact}', [TestHistoryController::class, 'artifact'])
+    ->whereIn('artifact', ['jmeter-readonly', 'jmeter-checkout', 'zap-html'])
+    ->name('test-history.artifact');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
