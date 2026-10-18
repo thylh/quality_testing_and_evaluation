@@ -15,7 +15,7 @@ Có thể giải nén gói ZIP đa nền tảng của ZAP vào `%LOCALAPPDATA%\P
 
 ## Khởi chạy môi trường mục tiêu cô lập
 
-Tập lệnh tạo cơ sở dữ liệu SQLite riêng tại `storage/framework/testing/zap.sqlite`, chạy chuyển đổi lược đồ và nạp dữ liệu sản phẩm vào tệp đó, sau đó khởi chạy Laravel tại `127.0.0.1:8017`. Tiến trình này ghi đè cấu hình cơ sở dữ liệu, phiên, bộ nhớ đệm, hàng đợi và thư điện tử; không sử dụng cơ sở dữ liệu trong `.env`.
+Tập lệnh tạo cơ sở dữ liệu SQLite riêng tại `storage/framework/testing/zap.sqlite`, chạy chuyển đổi lược đồ và nạp dữ liệu sản phẩm vào tệp đó, sau đó khởi chạy Laravel tại `127.0.0.1:8017` bằng máy chủ PHP tích hợp. Bộ định tuyến kiểm thử chuyển yêu cầu động đến Laravel và đặt các tiêu đề bảo mật cho tệp tĩnh để mô phỏng cấu hình Apache trong `.htaccess`. Tiến trình này ghi đè cấu hình cơ sở dữ liệu, phiên, bộ nhớ đệm, hàng đợi và thư điện tử; không sử dụng cơ sở dữ liệu trong `.env`.
 
 Từ thư mục gốc của dự án, chạy:
 
@@ -43,11 +43,13 @@ Lệnh này chỉ tạo lại lược đồ SQLite riêng cho ZAP. Không đổi
 
 Phần mềm trung gian Laravel đặt Chính sách bảo mật nội dung dùng mã nonce, `X-Frame-Options: DENY` và `X-Content-Type-Options: nosniff`; đồng thời gỡ `X-Powered-By` khi có thể. Khi triển khai Apache, `public/.htaccess` đặt thêm tiêu đề chống nhúng và chống nhận diện sai kiểu nội dung cho tệp tĩnh.
 
-Máy chủ PHP tích hợp dùng cho lần quét này phục vụ tệp tĩnh bên ngoài phần mềm trung gian Laravel. Do đó, ZAP vẫn có thể báo thiếu `X-Content-Type-Options` trên tệp tĩnh; nếu triển khai bằng máy chủ khác Apache, cần cấu hình tiêu đề tương đương tại máy chủ đó.
+Máy chủ PHP tích hợp thông thường phục vụ tệp tĩnh bên ngoài phần mềm trung gian Laravel. Bộ định tuyến riêng cho mục tiêu ZAP đặt các tiêu đề bảo mật tương ứng trên phản hồi tệp tĩnh. Khi triển khai bằng máy chủ khác Apache, cần cấu hình tiêu đề tương đương tại máy chủ thực tế.
 
-Cookie `XSRF-TOKEN` của cửa hàng vẫn có thể được mã phía trình duyệt đọc để hỗ trợ cơ chế chống giả mạo yêu cầu liên trang của Laravel. Cookie phiên vẫn có cờ HttpOnly. Các bảng định kiểu Google Fonts và Font Awesome bên ngoài hiện chưa có thuộc tính SRI nên vẫn là cảnh báo Baseline.
+Cookie `XSRF-TOKEN` của cửa hàng vẫn có thể được mã phía trình duyệt đọc để hỗ trợ cơ chế chống giả mạo yêu cầu liên trang của Laravel. Cookie phiên vẫn có cờ HttpOnly. Font Awesome 6.4.2 và League Spartan được đóng gói cùng ứng dụng qua Vite; trang không còn tải bảng định kiểu từ Google Fonts, Bunny Fonts hoặc cdnjs, nên cảnh báo thiếu SRI trên bảng định kiểu bên ngoài đã được loại bỏ.
 
-Chính sách CSP cho phép các máy chủ phân phối bảng định kiểu và phông chữ đang được sử dụng. Kiểu nội tuyến được cho phép theo mã nonce riêng của từng phản hồi; tập lệnh nội tuyến và bộ xử lý sự kiện nội tuyến không được cho phép.
+Lần Baseline gần nhất hoàn tất với 0 cảnh báo Trung bình, 1 cảnh báo Thấp và 3 cảnh báo Thông tin. Cảnh báo Thấp còn lại là cookie `XSRF-TOKEN` không có cờ HttpOnly; đây là yêu cầu của luồng CSRF hiện tại, không nên tắt cờ này nếu chưa thay đổi cách client gửi mã CSRF.
+
+Chính sách CSP chỉ cho phép bảng định kiểu và phông chữ cùng nguồn với ứng dụng. Kiểu nội tuyến cần thiết trên trang chào dùng mã nonce riêng theo từng phản hồi; tập lệnh nội tuyến và bộ xử lý sự kiện nội tuyến không được cho phép.
 
 ## Phạm vi và giới hạn
 

@@ -20,7 +20,9 @@ class SecurityHeadersTest extends TestCase
         $contentSecurityPolicy = $response->headers->get('Content-Security-Policy');
         $this->assertIsString($contentSecurityPolicy);
         $this->assertStringNotContainsString('unsafe-inline', $contentSecurityPolicy);
+        $this->assertStringNotContainsString('fonts.googleapis.com', $contentSecurityPolicy);
+        $this->assertStringNotContainsString('fonts.bunny.net', $contentSecurityPolicy);
+        $this->assertStringNotContainsString('cdnjs.cloudflare.com', $contentSecurityPolicy);
         $this->assertMatchesRegularExpression("/style-src [^;]*'nonce-([^']+)'/", $contentSecurityPolicy);
-
     }
 }

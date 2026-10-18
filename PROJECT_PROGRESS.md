@@ -102,10 +102,11 @@ Chạy máy chủ với `APP_ENV=local` và `DB_DATABASE=storefront_jmeter_test`
 - Lần quét ngày 18/10/2026 dùng địa chỉ `http://127.0.0.1:8017`, cơ sở dữ liệu SQLite riêng và `APP_DEBUG=false`. Bộ thu thập tìm thấy 75 địa chỉ; các yêu cầu trong phạm vi đều là GET. Không gửi biểu mẫu; các đường dẫn đăng nhập, đăng ký, đăng xuất, đặt hàng và sửa đổi giỏ hàng được loại trừ hoặc không thu thập.
 - Tệp báo cáo: `tests/zap/reports/zap-baseline.html` và `tests/zap/reports/zap-baseline.json`; tệp sinh ra được bỏ qua bởi Git.
 - Đã thêm phần mềm trung gian đặt tiêu đề bảo mật: CSP dùng mã nonce, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` và gỡ `X-Powered-By`. `public/.htaccess` bổ sung tiêu đề cho tệp tĩnh trên Apache. Đã loại bỏ bộ xử lý sự kiện nội tuyến của nút thêm giỏ hàng và chuyển kiểu trình bày nội tuyến liên quan sang lớp CSS.
-- Kết quả Baseline xác minh lại: **1 cảnh báo Trung bình, 2 cảnh báo Thấp, 3 cảnh báo Thông tin**. Đã hết cảnh báo CSP, chống nhúng trang và tiết lộ `X-Powered-By`.
-- Còn thiếu SRI trên Google Fonts và Font Awesome (Trung bình); cookie `XSRF-TOKEN` không có HttpOnly (Thấp, cần cho luồng CSRF phía trình duyệt); và tiêu đề `X-Content-Type-Options` còn thiếu trên một số tệp tĩnh do máy chủ PHP phát triển phục vụ ngoài phần mềm trung gian Laravel. Cấu hình Apache xử lý trường hợp triển khai trên Apache. Cookie phiên vẫn có HttpOnly.
-- PHPUnit đạt 28 bài kiểm thử; bộ thu thập ZAP tìm thấy 75 địa chỉ và cơ sở dữ liệu mục tiêu vẫn tách biệt. Chưa chạy quét có xác thực hoặc quét chủ động; không thay đổi máy móc thuộc tính của `XSRF-TOKEN`.
-- Thông tin phân tích của ZAP ghi nhận một lỗi và hai cảnh báo phụ trợ do chưa cài Firefox và không khởi tạo được tích hợp hồ sơ trình duyệt Selenium. Bộ thu thập truyền thống và phân tích thụ động vẫn hoàn tất; đây là giới hạn môi trường, không phải lỗi làm quét thất bại.
+- Đã tự lưu trữ Font Awesome 6.4.2 và phông League Spartan qua Vite; xóa các bảng định kiểu Bunny Fonts, Google Fonts và cdnjs khỏi trang. CSP được thu hẹp để chỉ cho phép tài nguyên kiểu chữ cùng phông cục bộ.
+- Baseline mới nhất: **0 cảnh báo Trung bình, 1 cảnh báo Thấp, 3 cảnh báo Thông tin**. Không còn cảnh báo SRI; các cảnh báo CSP, chống nhúng trang, header MIME và `X-Powered-By` đã được xử lý.
+- Cảnh báo thấp còn lại là cookie `XSRF-TOKEN` không có HttpOnly, cần cho luồng CSRF phía trình duyệt. Cookie phiên vẫn có HttpOnly. Máy chủ ZAP dùng bộ định tuyến kiểm thử đặt header bảo mật cho tệp tĩnh, tương ứng với cấu hình Apache trong `.htaccess`; cần cấu hình header tương đương nếu triển khai trên máy chủ khác Apache.
+- PHPUnit đạt 28 bài kiểm thử; bộ thu thập ZAP tìm thấy 73 địa chỉ và cơ sở dữ liệu mục tiêu vẫn tách biệt. Chưa chạy quét có xác thực hoặc quét chủ động; không thay đổi máy móc thuộc tính của `XSRF-TOKEN`.
+- Thông tin phân tích của ZAP có thể ghi nhận cảnh báo phụ trợ do thiếu tích hợp trình duyệt Firefox/Selenium. Bộ thu thập truyền thống và phân tích thụ động không cần Firefox; xem đây là giới hạn môi trường, không phải lỗi làm quét thất bại.
 
 ## 5. Giới hạn và việc còn lại
 

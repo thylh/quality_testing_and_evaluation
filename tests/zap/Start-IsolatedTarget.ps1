@@ -40,10 +40,12 @@ try {
         return
     }
 
+    $publicDirectory = Join-Path $repoRoot 'public'
+    $routerPath = Join-Path $PSScriptRoot 'router.php'
     Write-Output 'Serving the isolated ZAP target at http://127.0.0.1:8017. Press Ctrl+C to stop.'
-    & php artisan serve --host=127.0.0.1 --port=8017
+    & php -S 127.0.0.1:8017 -t $publicDirectory $routerPath
     if ($LASTEXITCODE -ne 0) {
-        throw "Laravel development server exited with code $LASTEXITCODE."
+        throw "The isolated PHP server exited with code $LASTEXITCODE."
     }
 }
 finally {

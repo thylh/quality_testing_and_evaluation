@@ -34,6 +34,12 @@ npm install
 npm run dev
 ```
 
+Để tạo tài nguyên giao diện dùng khi triển khai:
+
+```powershell
+npm run build
+```
+
 Không dùng cơ sở dữ liệu sản xuất cho kiểm thử tự động, kiểm thử tải hoặc kiểm thử ZAP. Xem các tài liệu kế hoạch, tiến độ và hướng dẫn ZAP để biết phạm vi cũng như môi trường thử nghiệm riêng.
 
 ## Kiểm thử

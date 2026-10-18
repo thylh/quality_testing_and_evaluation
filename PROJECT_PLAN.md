@@ -88,7 +88,8 @@ Kiểm tra các điểm cuối sản phẩm, mã phản hồi và nội dung ph�
 - Tạo báo cáo HTML và JSON trong `tests/zap/reports/`; báo cáo và cơ sở dữ liệu sinh ra không được đưa vào Git.
 - Xác minh từng cảnh báo theo ngữ cảnh; cảnh báo không mặc nhiên chứng minh có thể khai thác.
 - Chỉ xem xét quét có xác thực hoặc chủ động sau khi xác định tài khoản thử nghiệm, phạm vi URL, loại trừ thao tác ghi và được chấp thuận riêng.
-- Quét thụ động hiện còn cảnh báo thiếu SRI cho bảng định kiểu bên ngoài và cookie `XSRF-TOKEN` không có cờ HttpOnly. Cookie này cần được đọc phía trình duyệt cho luồng chống giả mạo yêu cầu liên trang của Laravel; không được bật HttpOnly một cách máy móc.
+- Bảng định kiểu Font Awesome và phông League Spartan được đóng gói cục bộ qua Vite; không còn dùng bảng định kiểu từ CDN. Cookie `XSRF-TOKEN` không có cờ HttpOnly là cần thiết cho luồng chống giả mạo yêu cầu liên trang của Laravel; không được bật HttpOnly một cách máy móc.
+- Kết quả Baseline hiện còn một cảnh báo thấp về cookie `XSRF-TOKEN`. Bộ định tuyến kiểm thử đặt tiêu đề bảo mật cho tệp tĩnh để phản ánh cấu hình Apache; cần cấu hình tương đương nếu triển khai bằng máy chủ khác.
 
 ## 6. Lộ trình và tiêu chí hoàn thành
 
@@ -198,14 +199,13 @@ Kiểm tra các điểm cuối sản phẩm, mã phản hồi và nội dung ph�
 
 ## 7. Trạng thái và việc tiếp theo
 
-Các chức năng cốt lõi, kiểm thử PHPUnit, Selenium, Postman/Newman, các kịch bản JMeter và tích hợp ZAP Baseline đã được triển khai. JMeter cần được hiểu là số liệu cục bộ; ZAP còn cảnh báo SRI và một số cảnh báo theo môi trường. Báo cáo tổng hợp cuối cùng đang được tạm hoãn.
+Các chức năng cốt lõi, kiểm thử PHPUnit, Selenium, Postman/Newman, các kịch bản JMeter và tích hợp ZAP Baseline đã được triển khai. JMeter cần được hiểu là số liệu cục bộ; ZAP không còn cảnh báo Trung bình. Cảnh báo thấp còn lại là cookie `XSRF-TOKEN` cần đọc được từ trình duyệt. Báo cáo tổng hợp cuối cùng đang được tạm hoãn.
 
 Việc tiếp theo khi tiếp tục dự án:
 
-1. Quyết định tự lưu trữ bảng định kiểu hoặc quản lý SRI cho Google Fonts và Font Awesome.
-2. Cấu hình `X-Content-Type-Options` cho tệp tĩnh theo máy chủ triển khai thực tế.
-3. Nếu cần đánh giá sâu hơn, thiết kế phạm vi và tài khoản riêng trước khi bật quét ZAP có xác thực hoặc chủ động.
-4. Khi được yêu cầu, lập báo cáo tổng hợp dựa trên kết quả đã lưu và các giới hạn nêu trên.
+1. Cấu hình `X-Content-Type-Options` cho tệp tĩnh theo máy chủ triển khai thực tế.
+2. Nếu cần đánh giá sâu hơn, thiết kế phạm vi và tài khoản riêng trước khi bật quét ZAP có xác thực hoặc chủ động.
+3. Khi được yêu cầu, lập báo cáo tổng hợp dựa trên kết quả đã lưu và các giới hạn nêu trên.
 
 ## 8. Điều kiện nghiệm thu cuối
 

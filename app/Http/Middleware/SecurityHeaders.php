@@ -28,8 +28,8 @@ class SecurityHeaders
             "frame-ancestors 'none'",
             "form-action 'self'",
             "img-src 'self' data: https://laravel.com",
-            "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net https://cdnjs.cloudflare.com",
-            "style-src 'self' 'nonce-{$styleNonce}' https://fonts.googleapis.com https://fonts.bunny.net https://cdnjs.cloudflare.com",
+            "font-src 'self' data:",
+            "style-src 'self' 'nonce-{$styleNonce}'",
             "script-src 'self'",
             "connect-src 'self'",
         ]));
