@@ -1,66 +1,50 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Cửa hàng trực tuyến Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Ứng dụng cửa hàng trực tuyến được xây dựng bằng Laravel, gồm danh mục sản phẩm, tài khoản người dùng, giỏ hàng, giao diện lập trình ứng dụng sản phẩm và quy trình đặt hàng thanh toán khi nhận hàng.
 
-## About Laravel
+## Chức năng chính
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Xem danh sách và thông tin chi tiết sản phẩm.
+- Đăng ký, đăng nhập và đăng xuất.
+- Quản lý giỏ hàng của khách và giỏ hàng gắn với tài khoản.
+- Đặt hàng bằng phương thức thanh toán khi nhận hàng; lưu thông tin sản phẩm tại thời điểm đặt.
+- Truy xuất danh sách và chi tiết sản phẩm qua giao diện lập trình ứng dụng.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Yêu cầu môi trường
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP theo phiên bản được khai báo trong `composer.json`.
+- Composer.
+- Cơ sở dữ liệu theo cấu hình của Laravel.
+- Node.js và npm nếu cần biên dịch tài nguyên giao diện.
 
-## Learning Laravel
+## Cài đặt và chạy
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```powershell
+composer install
+Copy-Item .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Nếu cần biên dịch tài nguyên giao diện, cài các gói npm và chạy máy chủ phát triển giao diện:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```powershell
+npm install
+npm run dev
+```
 
-## Laravel Sponsors
+Không dùng cơ sở dữ liệu sản xuất cho kiểm thử tự động, kiểm thử tải hoặc kiểm thử ZAP. Xem các tài liệu kế hoạch, tiến độ và hướng dẫn ZAP để biết phạm vi cũng như môi trường thử nghiệm riêng.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Kiểm thử
 
-### Premium Partners
+- Kiểm thử phía máy chủ: `php artisan test`.
+- Kịch bản Apache JMeter nằm trong `tests/jmeter/`.
+- Tập lệnh OWASP ZAP Baseline và hướng dẫn nằm trong `tests/zap/`.
+- Kết quả kiểm thử tải và báo cáo bảo mật được lưu theo cấu hình dự án; không xem các phép đo cục bộ là cam kết về năng lực sản xuất.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Tài liệu dự án
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- [Kế hoạch hoàn thiện và kiểm định](PROJECT_PLAN.md)
+- [Tiến độ và kết quả kiểm thử](PROJECT_PROGRESS.md)
+- [Hướng dẫn kiểm thử OWASP ZAP](tests/zap/README.md)

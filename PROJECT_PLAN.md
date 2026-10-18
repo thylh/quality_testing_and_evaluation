@@ -1,286 +1,216 @@
-# Kế hoạch dự án kiểm định hệ thống Laravel Storefront - Giai đoạn sơ khai
+# Kế hoạch hoàn thiện và kiểm định cửa hàng trực tuyến Laravel
 
-## 1. Bối cảnh ban đầu
+## 1. Mục đích
 
-Dự án đang ở trạng thái sơ khai, chưa có một kế hoạch kiểm định rõ ràng và chưa được tối ưu hóa theo hướng sản phẩm thương mại điện tử thực tế. Mục tiêu của dự án là xây dựng một hệ thống storefront đơn giản nhưng đủ đáp ứng các yêu cầu nghiệp vụ cơ bản như:
+Kế hoạch này mô tả phạm vi hoàn thiện cửa hàng trực tuyến, cách kiểm định các luồng chính và tiêu chí xác nhận kết quả. Dự án ưu tiên tính đúng đắn của nghiệp vụ, khả năng kiểm thử lặp lại và an toàn của môi trường kiểm thử. Kế hoạch được cập nhật theo trạng thái hiện tại, không còn mô tả dự án như khi mới bắt đầu.
 
-- hiển thị sản phẩm
-- xem chi tiết sản phẩm
-- quản lý giỏ hàng
-- đăng ký và đăng nhập người dùng
-- xử lý session và phân quyền cơ bản
-- kiểm thử chức năng, giao diện và hiệu năng
+## 2. Phạm vi dự án
 
-Ở giai đoạn đầu, dự án chủ yếu tập trung vào việc triển khai chức năng cơ bản của website và đánh giá chất lượng phần mềm sau đó bằng các công cụ phù hợp.
+### 2.1. Chức năng nghiệp vụ
 
----
+- Hiển thị danh sách sản phẩm, thông tin và trang chi tiết sản phẩm.
+- Hỗ trợ giỏ hàng của khách và giỏ hàng gắn với tài khoản; kiểm soát quyền sở hữu giỏ hàng.
+- Hỗ trợ đăng ký, đăng nhập, đăng xuất và xác thực dữ liệu đầu vào.
+- Cung cấp giao diện lập trình ứng dụng đọc danh sách sản phẩm và chi tiết sản phẩm.
+- Cho phép người dùng đã đăng nhập đặt hàng bằng phương thức thanh toán khi nhận hàng.
+- Lưu thông tin sản phẩm tại thời điểm đặt hàng; giữ nguyên giỏ hàng nếu quy trình đặt hàng thất bại.
 
-## 2. Mục tiêu tổng thể của dự án
+### 2.2. Ngoài phạm vi
 
-### 2.1. Mục tiêu nghiệp vụ
+- Tìm kiếm sản phẩm.
+- Phân quyền theo vai trò.
+- Tích hợp cổng thanh toán thực tế.
+- Cam kết năng lực tải hoặc thỏa thuận mức dịch vụ cho môi trường sản xuất.
+- Quét bảo mật chủ động hoặc quét có xác thực cho đến khi phạm vi và dữ liệu kiểm thử được phê duyệt riêng.
+- Báo cáo tổng kết chất lượng cuối cùng trong giai đoạn hiện tại; phần này đang được tạm hoãn.
 
-- Xây dựng website bán hàng đơn giản
-- Cho phép người dùng xem danh sách sản phẩm
-- Cho phép thêm sản phẩm vào giỏ hàng
-- Cho phép đăng ký / đăng nhập / đăng xuất
-- Quản lý giỏ hàng theo tài khoản hoặc session
-- Bảo vệ dữ liệu và tránh xung đột giữa người dùng với nhau
+## 3. Mục tiêu kiểm định
 
-### 2.2. Mục tiêu kiểm định
+- Dùng PHPUnit để kiểm tra nghiệp vụ, xác thực, giỏ hàng, đặt hàng và giao diện lập trình ứng dụng.
+- Dùng Selenium để tự động hóa các luồng người dùng quan trọng trên trình duyệt.
+- Dùng Postman/Newman để xác nhận mã phản hồi và nội dung của giao diện lập trình ứng dụng.
+- Dùng Apache JMeter để đo phản hồi và thông lượng ở một số mức tải, bao gồm luồng chỉ đọc và luồng đặt hàng.
+- Dùng OWASP ZAP Baseline để rà soát thụ động cấu hình và nội dung có thể quan sát trên ứng dụng chạy trong môi trường cô lập.
+- Lưu kịch bản và kết quả có thể chạy lại; ghi rõ giới hạn môi trường để tránh diễn giải kết quả thử nghiệm cục bộ thành cam kết sản xuất.
 
-- Kiểm thử chức năng bằng PHPUnit
-- Kiểm thử giao diện bằng Selenium
-- Kiểm thử API bằng Postman
-- Kiểm thử hiệu năng bằng JMeter
-- Đánh giá chất lượng tổng thể của hệ thống
+## 4. Phạm vi chức năng cần xác nhận
 
----
+### 4.1. Sản phẩm
 
-## 3. Yêu cầu chức năng cần có
+- Danh sách và chi tiết sản phẩm lấy dữ liệu nhất quán từ cơ sở dữ liệu.
+- Giao diện lập trình ứng dụng trả dữ liệu sản phẩm theo định dạng JSON và mã phản hồi phù hợp.
+- Trường hợp mã sản phẩm không tồn tại được xử lý rõ ràng.
 
-### 3.1. Chức năng sản phẩm
+### 4.2. Tài khoản và giỏ hàng
 
-- Hiển thị danh sách sản phẩm
-- Hiển thị hình ảnh, tên, giá, mô tả
-- Cho phép xem chi tiết một sản phẩm
-- Dữ liệu sản phẩm phải đồng nhất với database
+- Đăng ký, đăng nhập và đăng xuất hoạt động đúng.
+- Dữ liệu đầu vào được kiểm tra; số lượng sản phẩm phải hợp lệ.
+- Khách có thể sử dụng giỏ hàng theo phiên; giỏ hàng của tài khoản được giới hạn theo chủ sở hữu.
+- Người dùng không thể xem hoặc thay đổi giỏ hàng của tài khoản khác.
+- Có thể cập nhật và xóa mặt hàng trong giỏ hàng.
 
-### 3.2. Chức năng giỏ hàng
+### 4.3. Đặt hàng
 
-- Người dùng có thể thêm sản phẩm vào giỏ
-- Hệ thống phải kiểm tra số lượng hợp lệ
-- Hệ thống phải kiểm tra size / biến thể nếu có
-- Người dùng có thể sửa hoặc xóa sản phẩm trong giỏ
-- Thanh toán hoặc bước tiếp theo cần được quy định rõ ràng
+- Chỉ người dùng đã đăng nhập mới được tiếp tục đặt hàng.
+- Luồng thanh toán khi nhận hàng tạo đơn và bản chụp chi tiết sản phẩm.
+- Khi mô phỏng thanh toán thất bại, giỏ hàng được giữ lại để thử lại.
+- Kịch bản tải tạo dữ liệu chỉ được chạy trên cơ sở dữ liệu kiểm thử riêng.
 
-### 3.3. Chức năng người dùng
-
-- Đăng ký tài khoản
-- Đăng nhập bằng email và mật khẩu
-- Đăng xuất
-- Truy cập các trang có quyền sau khi đăng nhập
-- Không cho phép người dùng khác thao tác với giỏ hàng của người khác
-
-### 3.4. Chức năng API
-
-- API lấy danh sách sản phẩm
-- API lấy chi tiết sản phẩm theo ID
-- Response phải đúng định dạng JSON
-- Response code phải chính xác
-
----
-
-## 4. Tình trạng dự án ở giai đoạn sơ khai
-
-Dự án chưa có sự hoàn thiện đầy đủ theo các tiêu chí sau:
-
-- chưa có hệ thống auth rõ ràng và đầy đủ
-- chưa có kiểm soát rõ ràng về quyền sở hữu giỏ hàng
-- chưa có API chuẩn hóa
-- chưa có kiểm thử tự động đầy đủ
-- chưa có kế hoạch kiểm thử hiệu năng
-- chưa có báo cáo đánh giá chất lượng hệ thống
-- chưa có cấu trúc test rõ ràng với Selenium/JMeter/Postman
-
-Vì vậy, dự án cần được triển khai theo một lộ trình cụ thể để đưa từ trạng thái sơ khai lên mức có thể kiểm định và đánh giá chất lượng chính thức.
-
----
-
-## 5. Phương án công cụ kiểm thử phù hợp
+## 5. Công cụ và cách sử dụng
 
 ### 5.1. PHPUnit
 
-- Dùng cho kiểm thử logic backend
-- Kiểm tra đăng ký, đăng nhập, giỏ hàng, validation, API
-- Phù hợp với Laravel
+Kiểm thử tự động phía máy chủ cho xác thực, kiểm tra dữ liệu, quyền sở hữu giỏ hàng, đặt hàng và giao diện lập trình ứng dụng. Bộ kiểm thử hiện có 28 bài kiểm thử đạt.
 
 ### 5.2. Selenium
 
-- Dùng cho kiểm thử giao diện người dùng
-- Tạo browser automation để test các luồng chính
-- Phù hợp cho form đăng ký, đăng nhập, điều hướng, thêm sản phẩm
+Tự động hóa trình duyệt cho các luồng giao diện quan trọng như đăng ký, đăng nhập, điều hướng, giỏ hàng và đặt hàng. Hiện có 7 bài kiểm thử được ghi nhận đạt, bao gồm thử đặt hàng thất bại rồi thực hiện lại thành công.
 
-### 5.3. Postman
+### 5.3. Postman/Newman
 
-- Dùng cho kiểm thử API manual
-- Kiểm tra response code, payload và error handling
-- Phù hợp cho việc rà soát endpoint sản phẩm
+Kiểm tra các điểm cuối sản phẩm, mã phản hồi và nội dung phản hồi. Bộ sưu tập hiện ghi nhận 3 yêu cầu, 6 xác nhận và không có lỗi.
 
-### 5.4. JMeter
+### 5.4. Apache JMeter
 
-- Dùng cho kiểm thử hiệu năng
-- Kiểm tra hệ thống khi có nhiều user truy cập cùng lúc
-- Đo response time, throughput, error rate, mức độ chịu tải
+- Kịch bản chỉ đọc bao phủ trang chủ cửa hàng, trang sản phẩm, chi tiết sản phẩm, giỏ hàng và giao diện lập trình ứng dụng sản phẩm.
+- Kịch bản đặt hàng bao phủ đăng nhập, thêm sản phẩm, kiểm tra trang đặt hàng, tạo đơn thanh toán khi nhận hàng và đăng xuất.
+- Kết quả phải báo số yêu cầu, lỗi, thời gian phản hồi trung bình, phân vị 95, thời gian tối đa và thông lượng.
+- Dùng cơ sở dữ liệu riêng `storefront_jmeter_test`; không chạy kịch bản ghi dữ liệu trên cơ sở dữ liệu phát triển hoặc sản xuất.
+- Kết quả hiện có được tạo bằng máy chủ PHP phát triển trên máy cục bộ, do đó chỉ dùng để kiểm tra chức năng và so sánh trong cùng môi trường; không đại diện cho năng lực sản xuất.
 
----
+### 5.5. OWASP ZAP
 
-## 6. Lộ trình thực hiện từ đầu
+- Chạy ZAP Desktop/Automation Framework cài trực tiếp trên Windows; không yêu cầu Docker.
+- Dùng ZAP Baseline: thu thập địa chỉ bằng trình thu thập truyền thống và chờ phân tích thụ động; không bật bộ quét chủ động.
+- Chỉ quét `http://127.0.0.1:8017/`, `http://localhost:8017/` hoặc `http://[::1]:8017/`.
+- Chuẩn bị cơ sở dữ liệu SQLite riêng tại `storage/framework/testing/zap.sqlite`, nạp dữ liệu sản phẩm kiểm thử và tắt chế độ gỡ lỗi.
+- Không gửi biểu mẫu hoặc thực hiện thao tác làm thay đổi dữ liệu. Các đường dẫn đăng nhập, đăng ký, đăng xuất, đặt hàng và thay đổi giỏ hàng nằm ngoài phạm vi trình thu thập.
+- Tạo báo cáo HTML và JSON trong `tests/zap/reports/`; báo cáo và cơ sở dữ liệu sinh ra không được đưa vào Git.
+- Xác minh từng cảnh báo theo ngữ cảnh; cảnh báo không mặc nhiên chứng minh có thể khai thác.
+- Chỉ xem xét quét có xác thực hoặc chủ động sau khi xác định tài khoản thử nghiệm, phạm vi URL, loại trừ thao tác ghi và được chấp thuận riêng.
+- Quét thụ động hiện còn cảnh báo thiếu SRI cho bảng định kiểu bên ngoài và cookie `XSRF-TOKEN` không có cờ HttpOnly. Cookie này cần được đọc phía trình duyệt cho luồng chống giả mạo yêu cầu liên trang của Laravel; không được bật HttpOnly một cách máy móc.
 
-### Giai đoạn 1: Khảo sát và phân tích dự án
+## 6. Lộ trình và tiêu chí hoàn thành
 
-Mục tiêu:
+### Giai đoạn 1: Khảo sát và xác định phạm vi
 
-- xác định chức năng hiện có
-- xác định điểm yếu và thiếu sót
-- xác định các module cần chỉnh sửa trước khi kiểm thử
+**Công việc**
 
-Nhiệm vụ:
+- Rà soát đường dẫn, bộ điều khiển, mô hình dữ liệu, giao diện, lược đồ và các điểm cuối.
+- Ghi nhận luồng nghiệp vụ, dữ liệu nhạy cảm và các thao tác có thể thay đổi trạng thái.
+- Chốt các chức năng nằm trong và ngoài phạm vi.
 
-- rà soát route, controller, model, view
-- rà soát database và migration
-- xác định chức năng chưa hoàn thiện
-- xác định các trường hợp cần test
+**Tiêu chí hoàn thành**
 
-Kết quả mong đợi:
+- Có danh sách luồng chính và rủi ro cần kiểm thử.
+- Có môi trường và dữ liệu thử nghiệm riêng cho các kịch bản ghi dữ liệu.
 
-- có danh sách chức năng chính và chức năng thiếu
-- xác định ít nhất các module cần cải thiện: auth, cart, API, UI
+### Giai đoạn 2: Hoàn thiện nghiệp vụ cốt lõi
 
----
+**Công việc**
 
-### Giai đoạn 2: Hoàn thiện chức năng cốt lõi
+- Hoàn thiện đăng ký, đăng nhập, đăng xuất và kiểm tra dữ liệu.
+- Quản lý giỏ hàng khách và giỏ hàng tài khoản; ngăn truy cập chéo.
+- Chuẩn hóa giao diện lập trình ứng dụng sản phẩm.
+- Hoàn thiện đặt hàng thanh toán khi nhận hàng và xử lý thất bại.
 
-Mục tiêu:
+**Tiêu chí hoàn thành**
 
-- đưa dự án về trạng thái có logic nghiệp vụ cơ bản ổn định
+- Các luồng sản phẩm, tài khoản, giỏ hàng, giao diện lập trình ứng dụng và đặt hàng hoạt động đúng.
+- Lỗi không làm lộ hoặc làm thay đổi dữ liệu của người dùng khác.
 
-Nhiệm vụ:
+### Giai đoạn 3: Kiểm thử phía máy chủ
 
-- hoàn thiện đăng ký / đăng nhập / đăng xuất
-- quản lý session và role base cơ bản
-- gắn giỏ hàng với người dùng
-- xử lý guest cart hợp lý
-- thêm validation cho quantity, size, dữ liệu đầu vào
-- chuẩn hóa API đọc sản phẩm
+**Công việc**
 
-Kết quả mong đợi:
+- Kiểm thử đăng ký, đăng nhập, đăng xuất, xác thực dữ liệu và quyền sở hữu giỏ hàng.
+- Kiểm thử giao diện lập trình ứng dụng và các luồng đặt hàng thành công/thất bại.
 
-- chức năng chính hoạt động đúng
-- dữ liệu không bị xung đột giữa user và session
-- app có nền tảng đủ tốt để kiểm thử
+**Tiêu chí hoàn thành**
 
----
+- Bộ kiểm thử PHPUnit chạy thành công.
+- Lỗi kiểm thử được xử lý hoặc ghi nhận rõ ràng trước khi chấp nhận kết quả.
 
-### Giai đoạn 3: Thiết lập bộ test backend
+### Giai đoạn 4: Kiểm thử giao diện bằng trình duyệt
 
-Mục tiêu:
+**Công việc**
 
-- đảm bảo logic nghiệp vụ được tự động hóa và dễ kiểm tra
+- Tự động hóa điều hướng, đăng ký, đăng nhập, giỏ hàng và đặt hàng.
+- Xác nhận cả luồng thất bại có thể thử lại.
 
-Nhiệm vụ:
+**Tiêu chí hoàn thành**
 
-- viết test cho đăng ký
-- viết test cho đăng nhập
-- viết test cho logout
-- viết test cho validation
-- viết test cho cart ownership
-- viết test cho API sản phẩm
+- Các kịch bản giao diện chính chạy ổn định trong môi trường đã định.
+- Môi trường, trình duyệt và giới hạn của lần chạy được ghi lại.
 
-Kết quả mong đợi:
+### Giai đoạn 5: Kiểm thử giao diện lập trình ứng dụng
 
-- PHPUnit pass cho toàn bộ luồng chức năng chính
-- không còn lỗi logic nghiêm trọng ở backend
+**Công việc**
 
----
+- Kiểm tra danh sách sản phẩm, chi tiết sản phẩm, mã phản hồi và nội dung JSON.
+- Kiểm tra trường hợp dữ liệu không tồn tại và lỗi đầu vào liên quan.
 
-### Giai đoạn 4: Thiết lập Selenium cho UI testing
+**Tiêu chí hoàn thành**
 
-Mục tiêu:
-
-- kiểm thử trải nghiệm người dùng trên browser
-
-Nhiệm vụ:
-
-- setup Selenium WebDriver
-- viết test cho navigation
-- test form đăng nhập
-- test form đăng ký
-- test điều hướng giữa shop, cart, product detail
-- test logout
-
-Kết quả mong đợi:
-
-- ứng dụng có thể được test bằng automation UI
-- các luồng chính trên browser chạy ổn định
-
----
-
-### Giai đoạn 5: Kiểm thử API bằng Postman
-
-Mục tiêu:
-
-- xác nhận tính đúng đắn của API
-
-Nhiệm vụ:
-
-- tạo collection cho product API
-- xác nhận GET /api/products
-- xác nhận GET /api/products/{id}
-- xác nhận response code và body
-- kiểm tra error handling
-
-Kết quả mong đợi:
-
-- API hoạt động đúng chuẩn
-- có dữ liệu kiểm thử rõ ràng cho từng endpoint
-
----
+- Bộ sưu tập Postman/Newman có thể chạy lại và không có xác nhận thất bại.
 
 ### Giai đoạn 6: Kiểm thử hiệu năng bằng JMeter
 
-Mục tiêu:
+**Công việc**
 
-- đánh giá tốc độ và khả năng chịu tải của hệ thống
+- Chạy kịch bản chỉ đọc ở các mức tải phù hợp.
+- Chạy kịch bản đặt hàng có ghi dữ liệu trên cơ sở dữ liệu kiểm thử riêng.
+- Lưu kết quả và tính các chỉ số phản hồi, lỗi, thông lượng.
+- Dọn giỏ hàng thử nghiệm sau khi chạy; lưu ý đơn hàng kiểm thử có thể được tích lũy.
 
-Nhiệm vụ:
+**Tiêu chí hoàn thành**
 
-- tạo test plan cho home page
-- tạo test plan cho shop page
-- tạo test plan cho product detail
-- tạo test plan cho cart
-- tạo test plan cho API products
-- chạy với nhiều mức load khác nhau
+- Kịch bản có thể chạy lại, thời lượng tự dừng đúng và không nhầm lẫn cơ sở dữ liệu.
+- Kết quả ghi rõ đây là phép đo cục bộ, không phải kiểm thử năng lực sản xuất.
 
-Kết quả mong đợi:
+### Giai đoạn 6.5: Kiểm thử bảo mật thụ động bằng OWASP ZAP
 
-- có số liệu về response time, throughput, lỗi hệ thống
-- biết hệ thống ổn định ở mức tải nào
+**Công việc**
 
----
+- Khởi chạy ứng dụng trên loopback với SQLite riêng và chế độ gỡ lỗi tắt.
+- Chạy Baseline trên phạm vi được giới hạn; không quét chủ động và không gửi biểu mẫu.
+- Đọc báo cáo, phân loại cảnh báo, sửa cấu hình an toàn và chạy lại để xác minh.
+- Ghi lại cảnh báo còn lại, giới hạn máy chủ cục bộ và cảnh báo phụ trợ của ZAP.
 
-### Giai đoạn 7: Tổng hợp kết quả và đánh giá chất lượng
+**Tiêu chí hoàn thành**
 
-Mục tiêu:
+- Tập lệnh từ chối URL ngoài loopback hoặc sai cổng/đường dẫn.
+- Không phát sinh đơn hàng hoặc thay đổi dữ liệu nghiệp vụ lâu dài.
+- Có báo cáo mới, kết quả được diễn giải theo ngữ cảnh và không che giấu cảnh báo chưa xử lý.
 
-- đưa ra nhận định cuối cùng về hệ thống
+### Giai đoạn 7: Tổng hợp và đánh giá
 
-Nhiệm vụ:
+**Công việc**
 
-- tổng hợp kết quả từ PHPUnit, Selenium, Postman, JMeter
-- xác định thành phần đã đạt yêu cầu
-- xác định thành phần tồn tại lỗi hoặc thiếu sót
-- đề xuất cải tiến tiếp theo
+- Tổng hợp kết quả PHPUnit, Selenium, Postman/Newman, JMeter và ZAP.
+- Phân biệt lỗi đã sửa, rủi ro còn lại, giới hạn môi trường và phần ngoài phạm vi.
+- Đưa ra khuyến nghị ưu tiên và kết luận mức sẵn sàng.
 
-Kết quả mong đợi:
+**Tiêu chí hoàn thành**
 
-- báo cáo chất lượng hệ thống rõ ràng
-- dự án đạt mức sẵn sàng cho triển khai hoặc thuyết trình
+- Báo cáo có phạm vi, phương pháp, môi trường, kết quả, giới hạn và khuyến nghị.
+- Không diễn giải kết quả thử nghiệm cục bộ thành chứng nhận hoặc cam kết sản xuất.
 
----
+## 7. Trạng thái và việc tiếp theo
 
-## 7. Kết luận sơ khai
+Các chức năng cốt lõi, kiểm thử PHPUnit, Selenium, Postman/Newman, các kịch bản JMeter và tích hợp ZAP Baseline đã được triển khai. JMeter cần được hiểu là số liệu cục bộ; ZAP còn cảnh báo SRI và một số cảnh báo theo môi trường. Báo cáo tổng hợp cuối cùng đang được tạm hoãn.
 
-Dự án ở trạng thái đầu cần được xây dựng theo hướng rõ ràng: chức năng trước, kiểm thử sau. Trước hết, cần hoàn thiện logic nghiệp vụ cốt lõi như auth, cart, API và validation. Sau đó mới triển khai test tự động cho backend và UI. Cuối cùng mới làm kiểm thử hiệu năng và báo cáo tổng kết. Điều này giúp đảm bảo rằng hệ thống không chỉ “chạy được”, mà còn “được kiểm định đúng cách” theo chuẩn phần mềm thực tế.
+Việc tiếp theo khi tiếp tục dự án:
 
----
+1. Quyết định tự lưu trữ bảng định kiểu hoặc quản lý SRI cho Google Fonts và Font Awesome.
+2. Cấu hình `X-Content-Type-Options` cho tệp tĩnh theo máy chủ triển khai thực tế.
+3. Nếu cần đánh giá sâu hơn, thiết kế phạm vi và tài khoản riêng trước khi bật quét ZAP có xác thực hoặc chủ động.
+4. Khi được yêu cầu, lập báo cáo tổng hợp dựa trên kết quả đã lưu và các giới hạn nêu trên.
 
-## 8. Mục tiêu cuối cùng của dự án
+## 8. Điều kiện nghiệm thu cuối
 
-Đến khi hoàn thành, hệ thống cần đạt các tiêu chí sau:
-
-- chức năng chính hoạt động ổn định
-- dữ liệu và session được quản lý đúng
-- API trả về dữ liệu chuẩn
-- UI có thể được test bằng Selenium
-- hiệu năng được kiểm định bằng JMeter
-- có báo cáo đánh giá chất lượng và kết luận rõ ràng
+- Luồng nghiệp vụ trong phạm vi hoạt động đúng và dữ liệu được bảo vệ theo người dùng.
+- Bộ kiểm thử tự động và các bộ kiểm tra công cụ chạy lại được.
+- Kết quả hiệu năng và bảo mật có thể truy nguyên đến môi trường, dữ liệu và kịch bản cụ thể.
+- Cảnh báo chưa xử lý và giới hạn được công bố rõ ràng.
+- Có báo cáo kết luận khi phần tổng hợp được tiếp tục.

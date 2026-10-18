@@ -32,28 +32,12 @@
                     <h4>${{ $product->price }}</h4>
                 </div>
             </a>
-            {{-- <a href="#" onclick="event.preventDefault(); document.getElementById('add-to-cart-{{ $product->id }}').submit();">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </a>
-            <form id="add-to-cart-{{ $product->id }}" action="{{ route('addtocart', ['id' => $product->id]) }}" method="POST" style="display: none;">
+            <form action="{{ route('addtocart', ['id' => $product->id]) }}" method="POST" class="product-cart-form">
                 @csrf
-            </form> --}}
-
-            <form id="add-to-cart-{{ $product->id }}" action="{{ route('addtocart', ['id' => $product->id]) }}" method="POST" style="display: none;">
-                @csrf
-            </form>
-            <a href="#" onclick="event.preventDefault(); document.getElementById('add-to-cart-{{ $product->id }}').submit();">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </a>
-            
-            
-            {{-- <form action="{{ route('cart', $product->id) }}" method="GET">
-                @csrf
-                <button type="submit">
-                    <i class="fa-solid fa-cart-shopping"></i>
+                <button type="submit" class="product-cart-button" aria-label="Add {{ $product->name }} to cart">
+                    <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
                 </button>
-            </form> --}}
-            
+            </form>
         </div>
         @endforeach
     </div>

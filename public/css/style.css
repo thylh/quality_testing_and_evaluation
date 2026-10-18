@@ -257,6 +257,50 @@ body {
   color: #088178;
 }
 
+.product-cart-form {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+.product-cart-button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #cce7d0;
+  border-radius: 50%;
+  background: #e8f6ea;
+  color: #088178;
+  cursor: pointer;
+}
+
+.cart-remove-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cart-remove-icon {
+  color: red;
+}
+
+.cart-update-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-quantity-input {
+  width: 70px;
+}
+
+.news-title {
+  color: red;
+}
+
+.news-content {
+  color: blue;
+}
+
 /*------ banner section start ------*/
 
 #banner {

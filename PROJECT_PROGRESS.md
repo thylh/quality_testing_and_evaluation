@@ -1,82 +1,84 @@
-# Tiến độ dự án Laravel Storefront
+# Tiến độ dự án cửa hàng trực tuyến Laravel
 
-Cập nhật: 2026-10-17
+Cập nhật: 18/10/2026
 
-## Đã hoàn thành
+## 1. Chức năng đã hoàn thành
 
-- Hoàn thiện đăng ký, đăng nhập, đăng xuất, guest cart, cart ownership và validation.
-- Hoàn thiện Product API và collection Postman.
-- Triển khai checkout chỉ dành cho người dùng đã đăng nhập: COD, thanh toán mô phỏng thành công/thất bại, lưu snapshot đơn hàng và bảo toàn giỏ khi thanh toán thất bại.
-- Search được xác định là ngoài phạm vi; không triển khai role hoặc cổng thanh toán thật.
+- Hoàn thiện đăng ký, đăng nhập, đăng xuất, giỏ hàng khách, quyền sở hữu giỏ hàng và kiểm tra dữ liệu.
+- Hoàn thiện giao diện lập trình ứng dụng sản phẩm và bộ sưu tập Postman.
+- Hoàn thiện đặt hàng chỉ dành cho người dùng đã đăng nhập: thanh toán khi nhận hàng, mô phỏng thành công/thất bại, lưu bản chụp đơn hàng và giữ giỏ hàng nếu thanh toán thất bại.
+- Không triển khai tìm kiếm sản phẩm, phân quyền theo vai trò hoặc cổng thanh toán thực tế.
 
-## Kết quả kiểm thử
+## 2. Kết quả kiểm thử
 
-- PHPUnit: 27 tests passed, 111 assertions.
-- Selenium: 7 tests passed, gồm checkout mô phỏng thất bại rồi thử lại thành công.
-- Postman/Newman: 3 requests, 6 assertions, 0 failures.
-- JMeter read-only profile: 6 GET routes gồm `/home`, `/shop`, `/product/{id}`, `/cart`, `/api/products` và `/api/products/{id}`. Dữ liệu sản phẩm được seed vào SQLite tạm với 16 sản phẩm.
-- Mỗi profile chạy 2 vòng cho mỗi virtual user; ramp-up lần lượt là 1, 5 và 10 giây.
+- PHPUnit: 28 bài kiểm thử đạt trong lần chạy gần nhất.
+- Selenium: 7 bài kiểm thử đạt, bao gồm luồng đặt hàng thất bại rồi thử lại thành công.
+- Postman/Newman: 3 yêu cầu, 6 xác nhận, không có lỗi.
+- JMeter: có kịch bản chỉ đọc và kịch bản đặt hàng có ghi dữ liệu.
+- OWASP ZAP: Baseline thụ động hoàn tất trên môi trường cục bộ cô lập.
 
-### JMeter MySQL test run
+## 3. Kết quả JMeter
 
-Sau đó, cùng plan được chạy lại với schema MySQL riêng `storefront_jmeter_test`, 16 sản phẩm và cùng 6 GET routes. Ứng dụng vẫn chạy bằng PHP development server trên máy local; đây là kết quả MySQL-backed, chưa phải production benchmark.
+### 3.1. Kịch bản chỉ đọc trên MySQL
 
-| Virtual users | Samples | Errors | Avg response | p95 response | Max response | Throughput |
-| ------------: | ------: | -----: | -----------: | -----------: | -----------: | ---------: |
-|             1 |      12 |      0 |       153 ms |       181 ms |       181 ms |  6.1 req/s |
-|            10 |     120 |      0 |       969 ms |     1,398 ms |     1,427 ms |  7.3 req/s |
-|            25 |     300 |      0 |     2,567 ms |     4,060 ms |     4,297 ms |  7.2 req/s |
+Kịch bản bao phủ sáu điểm cuối GET: `/home`, `/shop`, `/product/{id}`, `/cart`, `/api/products` và `/api/products/{id}`. Cơ sở dữ liệu kiểm thử `storefront_jmeter_test` được nạp 16 sản phẩm. Các lần chạy dùng máy chủ PHP phát triển trên máy cục bộ; đây không phải phép đo môi trường sản xuất.
 
-JMeter MySQL result files:
+| Người dùng ảo | Mẫu yêu cầu | Lỗi | Phản hồi trung bình | Phân vị 95 | Phản hồi tối đa | Thông lượng |
+| ------------: | ----------: | --: | ------------------: | ---------: | --------------: | ----------: |
+| 1 | 12 | 0 | 153 mili giây | 181 mili giây | 181 mili giây | 6,1 yêu cầu/giây |
+| 10 | 120 | 0 | 969 mili giây | 1.398 mili giây | 1.427 mili giây | 7,3 yêu cầu/giây |
+| 25 | 300 | 0 | 2.567 mili giây | 4.060 mili giây | 4.297 mili giây | 7,2 yêu cầu/giây |
+
+Tệp kết quả:
 
 - `tests/jmeter/results-20261017-mysql-1vu.jtl`
 - `tests/jmeter/results-20261017-mysql-10vu.jtl`
 - `tests/jmeter/results-20261017-mysql-25vu.jtl`
 
-### MySQL steady-load run
+### 3.2. Tải ổn định chỉ đọc
 
-The read-only profile was run against the isolated `storefront_jmeter_test` schema with 16 seeded products. It used 10 virtual users, a 15-second ramp-up, a 120-second scheduled duration, per-thread cookies, and 500 ms think time. All six endpoints returned HTTP 200, and the run recorded no failed samples.
+Lần chạy dùng 10 người dùng ảo, tăng tải trong 15 giây, chạy 120 giây, thời gian nghỉ 500 mili giây giữa yêu cầu và cookie riêng theo luồng. Cả sáu điểm cuối trả HTTP 200; không có mẫu lỗi.
 
-| Virtual users | Scheduled duration | Samples | Errors | Avg response | p95 response | Max response | Throughput |
-| ------------: | -----------------: | ------: | -----: | -----------: | -----------: | -----------: | ---------: |
-|            10 |             120 s |     784 |      0 |       938 ms |     1,135 ms |     1,328 ms |  6.5 req/s |
+| Người dùng ảo | Thời lượng | Mẫu yêu cầu | Lỗi | Phản hồi trung bình | Phân vị 95 | Phản hồi tối đa | Thông lượng |
+| ------------: | ---------: | ----------: | --: | ------------------: | ---------: | --------------: | ----------: |
+| 10 | 120 giây | 784 | 0 | 938 mili giây | 1.135 mili giây | 1.328 mili giây | 6,5 yêu cầu/giây |
 
-The p95 is the nearest-rank percentile calculated from the JTL samples. After the run, the test schema still contained 16 products and zero carts, cart items, or orders.
+Phân vị 95 được tính theo phương pháp hạng gần nhất từ các mẫu JTL. Sau lần chạy, cơ sở dữ liệu kiểm thử còn 16 sản phẩm và không có giỏ hàng, mặt hàng giỏ hoặc đơn hàng.
 
-JMeter result file:
+Tệp kết quả: `tests/jmeter/results-20261017-mysql-steady-10vu-120s.jtl`.
 
-- `tests/jmeter/results-20261017-mysql-steady-10vu-120s.jtl`
+Trong tệp JMX, bộ lập lịch phải dùng giá trị boolean `true` cố định; JMeter không diễn giải biểu thức `__P(...)` trước đó trong trường này. Thời lượng vẫn có thể cấu hình và mặc định là 120 giây. Các kịch bản giới hạn số vòng lặp vẫn dừng theo số vòng đã đặt.
 
-The scheduler flag must be a literal `true` in the JMX; JMeter did not evaluate the prior `__P(...)` expression in this boolean field, so the old timed profile kept running when configured with infinite loops. The duration remains configurable and defaults to 120 seconds. Existing finite-loop smoke profiles still stop when their loop count is reached.
-
-Reproduce the steady run with the Laravel server connected to `storefront_jmeter_test`:
+Chạy lại từ thư mục gốc sau khi ứng dụng kết nối đến `storefront_jmeter_test`:
 
 ```powershell
 & 'C:\Users\admin\AppData\Local\Programs\JMeter\bin\jmeter.bat' -n -t '.\tests\jmeter\LaravelStorefrontAPI.jmx' -Jhost=localhost -Jport=8000 -Jthreads=10 -Jramp=15 -Jloops=-1 -Jduration=120 -Jthink_time=500 -j 'D:\jmeter-run\jmeter-steady-mysql.log' -l '.\tests\jmeter\results-20261017-mysql-steady-10vu-120s.jtl'
 ```
 
-### JMeter authenticated checkout load
+### 3.3. Tải ổn định cho luồng đặt hàng
 
-A separate write-enabled plan covers login, add-to-cart, checkout-page validation, COD order creation, and logout. Each virtual user has a dedicated `load-test-{thread number}@example.test` account and its own JMeter cookie jar. The plan checks the login/logout state, confirms the cart made it to checkout, and asserts the order confirmation. Checkout runs write orders to the database, so only run this plan against the isolated JMeter schema.
+Kịch bản riêng bao phủ đăng nhập, thêm sản phẩm vào giỏ, kiểm tra trang đặt hàng, tạo đơn thanh toán khi nhận hàng và đăng xuất. Mỗi người dùng ảo có tài khoản `load-test-{số luồng}@example.test` riêng cùng vùng cookie riêng. Kịch bản kiểm tra trạng thái đăng nhập/đăng xuất, giỏ hàng và xác nhận đơn hàng.
 
-The fixture seeder is guarded: it only runs in `local` or `testing` and when the active database name contains `jmeter`. It creates or updates 100 reserved test accounts by default and removes their carts before a run; it does not delete order history. After a timed run, rerun the seeder to clear any carts left partway through a checkout iteration.
+Bộ nạp dữ liệu kiểm thử chỉ chạy trong môi trường `local` hoặc `testing` và khi tên cơ sở dữ liệu có chứa `jmeter`. Mặc định, bộ nạp tạo/cập nhật 100 tài khoản thử nghiệm dành riêng và xóa giỏ hàng của họ trước lần chạy; không xóa lịch sử đơn hàng.
 
-The 10-user steady-load run used a 15-second ramp-up and 500 ms think time for 120 seconds. It produced 440 top-level sampler results and 71 completed COD orders, with zero failed samples. Response-time p95 is the nearest-rank percentile. The complete login-to-logout journey time is derived from JTL timestamps; endpoint counts differ because the timed run can stop a user between requests.
+Lần chạy ổn định dùng 10 người dùng ảo, tăng tải trong 15 giây, nghỉ 500 mili giây giữa yêu cầu và chạy 120 giây. Có 440 kết quả bộ lấy mẫu cấp cao nhất, 71 đơn hoàn tất và không có mẫu lỗi. Các bộ lấy mẫu có thể khác nhau vì lần chạy định thời có thể dừng giữa chừng trong một luồng.
 
-| Virtual users | Duration | Samples | Completed orders | Errors | Avg response | p95 response | Max response | Throughput |
-| ------------: | -------: | ------: | ---------------: | -----: | -----------: | -----------: | -----------: | ---------: |
-|            10 |   120 s |     440 |               71 |      0 |     2,075 ms |     3,014 ms |     3,477 ms |  3.6 req/s |
+| Người dùng ảo | Thời lượng | Mẫu yêu cầu | Đơn hoàn tất | Lỗi | Phản hồi trung bình | Phân vị 95 | Phản hồi tối đa | Thông lượng |
+| ------------: | ---------: | ----------: | -----------: | --: | ------------------: | ---------: | --------------: | ----------: |
+| 10 | 120 giây | 440 | 71 | 0 | 2.075 mili giây | 3.014 mili giây | 3.477 mili giây | 3,6 yêu cầu/giây |
 
-`POST /checkout` itself averaged 2,483 ms (p95 2,957 ms; maximum 3,060 ms). The completed-order rate was approximately 0.59 orders/second. In the separate 10-user one-loop run, the full login-to-logout journey averaged 12.2 seconds (p95 12.9 seconds). After the steady run, all 71 new orders and order-item snapshots were present. The fixture seeder was rerun afterward to clear partial carts; order history remains in the isolated test database.
+Riêng `POST /checkout` có phản hồi trung bình 2.483 mili giây, phân vị 95 là 2.957 mili giây và tối đa 3.060 mili giây. Tốc độ hoàn tất đơn xấp xỉ 0,59 đơn/giây. Trong lần chạy riêng với một giao dịch cho mỗi người dùng, toàn bộ hành trình đăng nhập đến đăng xuất trung bình 12,2 giây, phân vị 95 là 12,9 giây.
 
-JMeter checkout files:
+Sau lần chạy ổn định, 71 đơn mới và các bản chụp mặt hàng đều có trong cơ sở dữ liệu. Bộ nạp dữ liệu được chạy lại để dọn các giỏ dở dang; lịch sử đơn vẫn còn trong cơ sở dữ liệu kiểm thử riêng.
+
+Tệp và dữ liệu liên quan:
 
 - `tests/jmeter/LaravelStorefrontCheckout.jmx`
-- `tests/jmeter/results-20261017-checkout-10vu-1loop.jtl` (10-user, one-transaction-per-user validation)
+- `tests/jmeter/results-20261017-checkout-10vu-1loop.jtl`
 - `tests/jmeter/results-20261017-mysql-checkout-steady-10vu-120s.jtl`
 - `database/seeders/JMeterCheckoutSeeder.php`
 
-Prepare the dedicated test accounts (run this before each checkout test and once afterward to clear remaining carts):
+Chuẩn bị tài khoản thử nghiệm trước và sau mỗi lần chạy để xóa các giỏ còn lại:
 
 ```powershell
 $env:APP_ENV = 'local'
@@ -87,15 +89,28 @@ $env:JMETER_PASSWORD = 'Jmeter-Checkout-Only-2026!'
 php artisan db:seed --class=JMeterCheckoutSeeder --no-interaction
 ```
 
-Run the web server with `APP_ENV=local` and `DB_DATABASE=storefront_jmeter_test`, then start the steady checkout profile:
+Chạy máy chủ với `APP_ENV=local` và `DB_DATABASE=storefront_jmeter_test`, sau đó chạy kịch bản:
 
 ```powershell
 & 'C:\Users\admin\AppData\Local\Programs\JMeter\bin\jmeter.bat' -n -t '.\tests\jmeter\LaravelStorefrontCheckout.jmx' -Jhost=localhost -Jport=8000 -Jproduct_id=1 -Jthreads=10 -Jramp=15 -Jloops=-1 -Jduration=120 -Jthink_time=500 -j 'D:\jmeter-run\jmeter-checkout-steady.log' -l 'D:\jmeter-run\results-checkout-steady.jtl'
 ```
 
-## Giới hạn và việc còn lại
+## 4. OWASP ZAP Baseline
 
-- Các lần chạy dùng PHP development server trên máy local; SQLite và MySQL là hai profile riêng, không phải benchmark production hoặc cam kết SLA/capacity.
-- Read-only load chỉ dùng GET; checkout load tạo order COD trong database test và không thực hiện thanh toán thật.
-- Tải checkout dài hơn có thể để lại đơn hàng test tích lũy; seeder chỉ dọn giỏ của các tài khoản JMeter, không xóa order history.
-- Báo cáo đánh giá tổng hợp cuối cùng vẫn được hoãn theo yêu cầu.
+- Đã cài ZAP 2.17.0 từ gói đa nền tảng chính thức tại `%LOCALAPPDATA%\Programs\OWASP-ZAP`; không dùng Docker và không cần quyền quản trị.
+- Tập lệnh `tests/zap/Invoke-BaselineScan.ps1` tự tìm chương trình ZAP, chạy bộ khung tự động hóa, thu thập địa chỉ và phân tích thụ động, sau đó tạo báo cáo HTML/JSON.
+- Lần quét ngày 18/10/2026 dùng địa chỉ `http://127.0.0.1:8017`, cơ sở dữ liệu SQLite riêng và `APP_DEBUG=false`. Bộ thu thập tìm thấy 75 địa chỉ; các yêu cầu trong phạm vi đều là GET. Không gửi biểu mẫu; các đường dẫn đăng nhập, đăng ký, đăng xuất, đặt hàng và sửa đổi giỏ hàng được loại trừ hoặc không thu thập.
+- Tệp báo cáo: `tests/zap/reports/zap-baseline.html` và `tests/zap/reports/zap-baseline.json`; tệp sinh ra được bỏ qua bởi Git.
+- Đã thêm phần mềm trung gian đặt tiêu đề bảo mật: CSP dùng mã nonce, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` và gỡ `X-Powered-By`. `public/.htaccess` bổ sung tiêu đề cho tệp tĩnh trên Apache. Đã loại bỏ bộ xử lý sự kiện nội tuyến của nút thêm giỏ hàng và chuyển kiểu trình bày nội tuyến liên quan sang lớp CSS.
+- Kết quả Baseline xác minh lại: **1 cảnh báo Trung bình, 2 cảnh báo Thấp, 3 cảnh báo Thông tin**. Đã hết cảnh báo CSP, chống nhúng trang và tiết lộ `X-Powered-By`.
+- Còn thiếu SRI trên Google Fonts và Font Awesome (Trung bình); cookie `XSRF-TOKEN` không có HttpOnly (Thấp, cần cho luồng CSRF phía trình duyệt); và tiêu đề `X-Content-Type-Options` còn thiếu trên một số tệp tĩnh do máy chủ PHP phát triển phục vụ ngoài phần mềm trung gian Laravel. Cấu hình Apache xử lý trường hợp triển khai trên Apache. Cookie phiên vẫn có HttpOnly.
+- PHPUnit đạt 28 bài kiểm thử; bộ thu thập ZAP tìm thấy 75 địa chỉ và cơ sở dữ liệu mục tiêu vẫn tách biệt. Chưa chạy quét có xác thực hoặc quét chủ động; không thay đổi máy móc thuộc tính của `XSRF-TOKEN`.
+- Thông tin phân tích của ZAP ghi nhận một lỗi và hai cảnh báo phụ trợ do chưa cài Firefox và không khởi tạo được tích hợp hồ sơ trình duyệt Selenium. Bộ thu thập truyền thống và phân tích thụ động vẫn hoàn tất; đây là giới hạn môi trường, không phải lỗi làm quét thất bại.
+
+## 5. Giới hạn và việc còn lại
+
+- Các phép đo JMeter dùng máy chủ PHP phát triển trên máy cục bộ, không phải phép đo môi trường sản xuất hoặc cam kết mức dịch vụ/năng lực.
+- Kịch bản chỉ đọc chỉ gửi GET; kịch bản đặt hàng tạo đơn thanh toán khi nhận hàng trong cơ sở dữ liệu thử nghiệm, không thực hiện thanh toán thật.
+- Các lần chạy đặt hàng dài có thể tích lũy đơn thử nghiệm. Bộ nạp dọn giỏ của tài khoản JMeter nhưng không xóa lịch sử đơn.
+- Quét ZAP hiện chỉ là Baseline thụ động trong môi trường cục bộ; chưa có quét chủ động hoặc có xác thực.
+- Báo cáo tổng hợp đánh giá chất lượng cuối cùng đang được tạm hoãn theo yêu cầu.

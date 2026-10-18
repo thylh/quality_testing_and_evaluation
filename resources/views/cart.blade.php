@@ -24,8 +24,8 @@
                                 <form action="{{ route('remove', $item->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" style="border: none; background: none; cursor: pointer;">
-                                        <i class="fa fa-times-circle" style="color: red;"></i>
+                                    <button type="submit" class="cart-remove-button" aria-label="Remove {{ $item->product->name }} from cart">
+                                        <i class="fa fa-times-circle cart-remove-icon" aria-hidden="true"></i>
                                     </button>
                                 </form>
                             </td>
@@ -34,12 +34,11 @@
                             <td>{{ $item->product->name }}</td>
                             <td>{{ number_format($item->price) }} USD</td>
                             <td>
-                                <form action="{{ route('cart.update', $item->id) }}" method="POST"
-                                    style="display: inline-flex; gap: 8px; align-items: center;">
+                                <form action="{{ route('cart.update', $item->id) }}" method="POST" class="cart-update-form">
                                     @csrf
                                     @method('PUT')
                                     <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="99"
-                                        style="width: 70px;" />
+                                        class="cart-quantity-input" />
                                     <button type="submit" class="normal">Cập nhật</button>
                                 </form>
                             </td>

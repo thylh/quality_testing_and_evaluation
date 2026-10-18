@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/framework/testing/zap.sqlite
 /vendor
 .env
 .env.backup
@@ -21,3 +22,4 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/tests/zap/reports/
