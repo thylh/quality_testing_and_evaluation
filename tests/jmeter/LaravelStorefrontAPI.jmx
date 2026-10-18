@@ -30,8 +30,8 @@
                 </elementProp>
                 <stringProp name="ThreadGroup.num_threads">${__P(threads,10)}</stringProp>
                 <stringProp name="ThreadGroup.ramp_time">${__P(ramp,5)}</stringProp>
-                <boolProp name="ThreadGroup.scheduler">${__P(scheduler,false)}</boolProp>
-                <stringProp name="ThreadGroup.duration">${__P(duration,0)}</stringProp>
+                <boolProp name="ThreadGroup.scheduler">true</boolProp>
+                <stringProp name="ThreadGroup.duration">${__P(duration,120)}</stringProp>
                 <stringProp name="ThreadGroup.delay"></stringProp>
             </ThreadGroup>
             <hashTree>
